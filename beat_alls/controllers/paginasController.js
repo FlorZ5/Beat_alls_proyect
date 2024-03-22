@@ -6,6 +6,59 @@ const productosModel = require('../models/productosModel.js');
 const proveedorModel = require('../models/proveedorModel.js');
 const { use } = require('../routes/rutas.js');
 
+
+/*Controladores generales*/
+/*Controlador para acceder al login*/
+const Login = (req, res) => {
+    res.render('login', {
+        titulo: "Login",
+        enc: "Inicia Sesión"
+    });
+}
+
+const inicioSesion = async (req, res) => {
+    try {
+        const consultar_Proveedor = await proveedorModel.findAll();
+        const { login, password } = req.body;
+        const usuario = await usuarioModel.findOne({
+            where: {
+                [sequelize.Op.or]: [
+                    { Nombre_usuario: login },
+                    { Correo: login }
+                ]
+            }
+        });
+
+        const cliente = await clienteModel.findOne({
+            where: {
+                [sequelize.Op.or]: [
+                    { Nombre_usuario: login },
+                    { Correo: login }
+                ]
+            }
+        });
+
+        if (usuario) {
+            if (usuario.Contrasena === password) {
+                res.render('proveedoresRegistrados', {consultar_Proveedor, titulo: "Productos", enc: 'Registro de usuarios' });
+            } else {
+                res.send('Contraseña incorrecta');
+            }
+        } else if (cliente) {
+            if (cliente.Contrasena === password) {
+                res.render('productos', { titulo: "Productos", enc: 'Registro de clientes' });
+            } else {
+                res.send('Contraseña incorrecta');
+            }
+        } else {
+            res.send('Usuario o cliente no encontrado');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+}
+/*                                           Fin de controladores generales                                     */
 /*                                           CRUD Usuarios                                     */
 /*Ingreso al formulario para registro de usuarios*/
 const registroUsuarios = (req, res)=>{//cada que se ponga la ruta raiz responde el router/para poder usar dicha ruta raiz se debe exportar
@@ -491,5 +544,7 @@ module.exports = {
     consultasProveedores, 
     actualizacionProveedor,
     actualizarProveedor,
-    eliminarProveedor
+    eliminarProveedor,
+    Login,
+    inicioSesion
 }

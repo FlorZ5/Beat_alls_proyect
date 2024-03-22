@@ -2,6 +2,12 @@ const express= require('express')//se importa express
 const router= express.Router();//se crea el router que va a gestionar rutas
 const paginas = require('../controllers/paginasController.js');
 
+/*Rutas generales*/
+/*Login*/
+router.get("/login", paginas.Login); //Obtener el formulario de Login.
+
+router.post("/inicioSesion", paginas.inicioSesion); //Enviar los datos del formulario.
+/*Aquí terminan las rutas generales*/
 /*Aquí inician las rutas del CRUD usuarios*/
 router.get("/usuariosRegistrados", paginas.consultasUsuarios);
 
