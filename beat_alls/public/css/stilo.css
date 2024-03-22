@@ -1,0 +1,57 @@
+body{
+    background-image: url("fondo3.jpg");
+}
+form{
+    background-color: rgba(0, 0, 0, 0.199);
+    border-radius: 30px;
+    padding: 10px;
+    box-shadow: 7px 7px 5px rgba(0, 0, 0, 0.377);
+    text-shadow: 2px 3px 3px rgba(0, 0, 0, 0.377);
+}
+form input{
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.377);
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+button{
+    width: 110px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.377);
+    margin: 15px;
+}
+button h6{
+    color: black;
+}
+a{
+    color: rgb(0, 0, 161);
+    margin: 15px;
+}
+a:hover{
+    color: white;
+}
+h1{
+    color: white;
+}
+h3{
+    color: white;
+}
+h5{
+    color: white;
+}
+.h1{
+    color: white;
+    text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.377);
+}
+p{
+    text-align: justify;
+}
+h6{
+    text-align: center;
+}
+div .tarjeta{
+    border-bottom: 100px;
+}
+footer{
+    background-color: whitesmoke;
+    color: black;
+    margin-top: 45px;
+}

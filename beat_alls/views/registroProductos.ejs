@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/stilo.css">
+</head>
+<body>
+    <%- include('./layout/header.ejs'); -%>
+    <form action="/registroProductos" method="post">
+        <label for="Nombre">Nombre del producto</label>
+        <input name="Nombre_producto" id="Nombre_producto" type="text">
+        <br>
+        <label for="Descripcion">Descripción</label>
+        <input name="Descripcion" id="Descripcion" type="text">
+        <br>
+        <label for="Color">Color</label>
+        <input name="Color" id="Color" type="text">
+        <br>
+        <label for="Talla">Talla</label>
+        <input name="Talla" id="Talla" type="text">
+        <br>
+        <label for="Material">Material</label>
+        <input name="Material" id="Material" type="text">
+        <br>
+        <label for="Marca">Marca</label>
+        <input name="Marca" id="Marca" type="text">
+        <br>
+        <label for="Temporada">Temporada</label>
+        <input name="Temporada" id="Temporada" type="text">
+        <br>
+        <label for="Precio">Precio</label>
+        <input name="Precio" id="Precio" type="text">
+        <br>
+        <label for="Existencias">Existencias</label>
+        <input name="Existencias" id="Existencias" type="text">
+        <br>
+        <label for="ID_Proveedor">ID Proveedor</label>
+        <input name="ID_Proveedor" id="ID_Proveedor" type="text">
+        <br>
+        <button type="submit">Registrar producto</button>
+    </form> 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

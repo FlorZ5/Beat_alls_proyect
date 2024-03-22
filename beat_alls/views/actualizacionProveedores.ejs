@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Proveedor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/stilo.css">
+</head>
+<body>
+    <%- include('./layout/header.ejs'); -%>
+    <div class="container">
+        <h1>Actualizar Proveedor</h1>
+        <form action="/proveedoresRegistrados/<%- ID_Proveedor %>" method="post">
+            <div class="mb-3">
+                <label for="Nombre" class="form-label">Nombre:</label>
+                <input name="Nombre" id="Nombre" class="form-control" type="text" value="<%- Nombre %>">
+                <span class="form-text">Nombre actual: <%- Nombre %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Apellido" class="form-label">Apellido:</label>
+                <input name="Apellido" id="Apellido" class="form-control" type="text" value="<%- Apellido %>">
+                <span class="form-text">Apellido actual: <%- Apellido %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Telefono" class="form-label">Telefono:</label>
+                <input name="Telefono" id="Telefono" class="form-control" type="text" value="<%- Telefono %>">
+                <span class="form-text">Telefono: <%- Telefono %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Correo" class="form-label">Correo electrónico:</label>
+                <input name="Correo" id="Correo" class="form-control" type="email" value="<%- Correo %>">
+                <span class="form-text">Correo: <%- Correo %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Empresa" class="form-label">Empresa:</label>
+                <input name="Empresa" id="Empresa" class="form-control" type="text" value="<%- Empresa %>">
+                <span class="form-text">Empresa: <%- Empresa %></span>
+            </div>
+
+            <input type="hidden" name="_method" value="put">
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

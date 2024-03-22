@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/stilo.css">
+</head>
+<body>
+    <%- include('./layout/header.ejs'); -%>
+    <form action="/registroProveedores" method="post">
+        <label for="Nombre">Nombre</label>
+        <input name="Nombre" id="Nombre" type="text">
+        <br>
+        <label for="Apellido">Apellido</label>
+        <input name="Apellido" id="Apellido" type="text">
+        <br>
+        <label for="Telefono">Telefono</label>
+        <input name="Telefono" id="Telefono" type="text">
+        <br>
+        <label for="Correo">Correo electrónico</label>
+        <input name="Correo" id="Correo" type="email">
+        <br>
+        <label for="Empresa">Empresa</label>
+        <input name="Empresa" id="Empresa" type="text">
+        <br>
+        <button type="submit">Registrarse</button>
+    </form> 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Usuario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="css/stilo.css">
+</head>
+<body>
+    <%- include('./layout/header.ejs'); -%>
+    <div class="container">
+        <h1>Actualizar Usuario</h1>
+        <form action="/usuariosRegistrados/<%- ID_Usuario %>" method="post">
+            <div class="mb-3">
+                <label for="Nombre" class="form-label">Nombre:</label>
+                <input name="Nombre" id="Nombre" class="form-control" type="text" value="<%- Nombre %>">
+                <span class="form-text">Nombre actual: <%- Nombre %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Apellido" class="form-label">Apellido:</label>
+                <input name="Apellido" id="Apellido" class="form-control" type="text" value="<%- Apellido %>">
+                <span class="form-text">Apellido actual: <%- Apellido %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Direccion" class="form-label">Dirección:</label>
+                <input name="Direccion" id="Direccion" class="form-control" type="text" value="<%- Direccion %>">
+                <span class="form-text">Dirección actual: <%- Direccion %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Edad" class="form-label">Edad:</label>
+                <input name="Edad" id="Edad" class="form-control" type="text" value="<%- Edad %>">
+                <span class="form-text">Edad actual: <%- Edad %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Fecha_nacimiento" class="form-label">Fecha de nacimiento:</label>
+                <input name="Fecha_nacimiento" id="Fecha_nacimiento" class="form-control" type="date" value="<%- Fecha_nacimiento %>">
+                <span class="form-text">Fecha de nacimiento actual: <%- Fecha_nacimiento %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Telefono" class="form-label">Telefono:</label>
+                <input name="Telefono" id="Telefono" class="form-control" type="text" value="<%- Telefono %>">
+                <span class="form-text">Telefono actual: <%- Telefono %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Correo" class="form-label">Correo electrónico:</label>
+                <input name="Correo" id="Correo" class="form-control" type="email" value="<%- Correo %>">
+                <span class="form-text">Correo actual: <%- Correo %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Rol" class="form-label">Rol:</label>
+                <select name="Rol" id="Rol" class="form-control">
+                    <option value="Administrador" id="Administrador">Administrador</option>
+                    <option value="Moderador" id="Moderador">Moderador</option>
+                </select>
+                <span class="form-text">Rol actual: <%- Rol %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Nombre_usuario" class="form-label">Nombre de usuario:</label>
+                <input name="Nombre_usuario" id="Nombre_usuario" class="form-control" type="text" value="<%- Nombre_usuario %>">
+                <span class="form-text">Nombre de usuario actual: <%- Nombre_usuario %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Contrasena" class="form-label">Contraseña:</label>
+                <input name="Contrasena" id="Contrasena" class="form-control" type="password" value="<%- Contrasena %>">
+            </div>
+            <input type="hidden" name="_method" value="put">
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>
