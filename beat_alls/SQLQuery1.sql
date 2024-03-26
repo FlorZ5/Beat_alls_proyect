@@ -11,7 +11,7 @@ Edad smallint not null,
 Telefono bigint not null unique, 
 Correo Varchar (30) not null unique, 
 Nombre_usuario Varchar (15) not null unique, 
-Contrasena Varchar (8) not null
+Contrasena Varchar (150) not null
 );
 go
 create table Proveedor 
@@ -85,7 +85,7 @@ Telefono bigint not null unique,
 Correo Varchar (30) not null unique,
 Rol Varchar (25) not null,
 Nombre_usuario Varchar(15) not null unique,
-Contrasena Varchar (8) not null
+Contrasena Varchar (150) not null
 );
 go
 create table logs_cliente

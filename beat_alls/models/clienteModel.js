@@ -38,6 +38,11 @@ const clienteModel = db.define('cliente', {//usuarios corresponde a la tabala co
         unique: true,
         allowNull: false
     },
+    Rol:{
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'Usuario'
+    },
     Nombre_usuario: {
         type: DataTypes.STRING,
         unique: true,

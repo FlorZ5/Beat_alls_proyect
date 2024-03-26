@@ -7,8 +7,9 @@ const db = require('./config/db.js')//constante para importar bd
 const myConnection = require('express-myconnection');
 const mysql = require('mysql')
 const methodOverride = require('method-override');
-
-//middleware
+const session = require('express-session')
+/*              Middlewares         */
+//Llamado a la base de datos
 app.use(myConnection(mysql, {
     host: 'localhost',
     user: 'root',
@@ -16,26 +17,39 @@ app.use(myConnection(mysql, {
     port: 3306,
     database: 'beat_alls'
 }, 'single'));
-app.use(express.urlencoded({extended: true})) //Tomar los datos del formulario.
 
-// Middleware para analizar solicitudes JSON
+//Llamado de datos de los form
+app.use(express.urlencoded({extended: true}));
+
+//Analisis de solicitudes JSON
 app.use(express.json());
 
-// Middleware para utilizar method-override
+app.use(session({
+  secret: 'EdgeSlayer97', // Cambia esto por una cadena aleatoria y segura
+  resave: false,
+  saveUninitialized: true
+}));
+
+//Method-override para solicitudes put y delete
 app.use(methodOverride('_method'));
 
+//Definición de rutas hacia la carpeta public
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.set('views', path.join(__dirname, 'views'));//se indica que busque en la carpeta views las vistas para evitar confunfuciones, el path.join ayuda que la ruta se encuentre más rapido y lograr conversiones de diagonales en las rutas
+//Definición de rutas hacia la carpeta views
+app.set('views', path.join(__dirname, 'views'));
+
+//Define el uso del motor de plantillas EJS
 app.set('view engine', 'ejs');//para setiar el ejs y que se corra cada que se ejecute la app
 
-app.use(rutas);//para hacer uso de las rutas
+//Llama al archivo rutas.js
+app.use(rutas);
 
 app.listen(port, ()=>{ //contiene una funcion para escuchar el puerto, donde manda como mensaje el numero del puerto 
     console.log(`Listening on port ${port}`);
 });
 
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Algo salio mal :(');
+  console.error(err.stack);
+  next(err); 
 });

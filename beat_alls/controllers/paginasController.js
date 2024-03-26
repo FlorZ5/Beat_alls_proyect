@@ -1,5 +1,8 @@
 const db = require('../config/db.js');
-const sequelize = require('sequelize');
+const {Op, sequelize, where} = require('sequelize');
+const {encrypt, compare} = require('../helpers/handleBcrypt.js');
+const { generateToken } = require('../helpers/generateToken');
+const jwt = require('jsonwebtoken');
 const usuarioModel = require('../models/usuarioModel.js');
 const clienteModel = require('../models/clienteModel.js');
 const productosModel = require('../models/productosModel.js');
@@ -7,6 +10,13 @@ const proveedorModel = require('../models/proveedorModel.js');
 const { use } = require('../routes/rutas.js');
 
 
+
+const productos = (req, res) => {
+    res.render('productos', {
+        titulo: "Tienda",
+        enc: "Productos"
+    })
+}
 /*Controladores generales*/
 /*Controlador para acceder al login*/
 const Login = (req, res) => {
@@ -18,50 +28,71 @@ const Login = (req, res) => {
 
 const inicioSesion = async (req, res) => {
     try {
-        const consultar_Proveedor = await proveedorModel.findAll();
-        const { login, password } = req.body;
-        const usuario = await usuarioModel.findOne({
-            where: {
-                [sequelize.Op.or]: [
-                    { Nombre_usuario: login },
-                    { Correo: login }
-                ]
-            }
-        });
+        const { Login, Contrasena } = req.body;
+        const valorAdmin = "Administrador";
+        const valorEmpleado = "Empleado";
+        const usuario = await usuarioModel.findOne({ where: { 
+            [Op.or]: [{Nombre_usuario: Login}, {Correo: Login}] 
+        }});
 
-        const cliente = await clienteModel.findOne({
-            where: {
-                [sequelize.Op.or]: [
-                    { Nombre_usuario: login },
-                    { Correo: login }
-                ]
-            }
-        });
+        const cliente = await clienteModel.findOne({ where: {
+            [Op.or]: [{Nombre_usuario: Login}, {Correo: Login}]
+        }});
+
+
+        if (!usuario && !cliente) {
+            return res.status(404).render('login', {
+                titulo: "Login",
+                enc: "Inicia sesión"
+            });
+        }          
 
         if (usuario) {
-            if (usuario.Contrasena === password) {
-                res.render('proveedoresRegistrados', {consultar_Proveedor, titulo: "Productos", enc: 'Registro de usuarios' });
-            } else {
-                res.send('Contraseña incorrecta');
+            const validarContraUsuario = await compare(Contrasena, usuario.Contrasena);
+            if (validarContraUsuario) {
+                const consultar_Proveedor = await proveedorModel.findAll();
+                req.session.userRole = 'Administrador';
+                res.render('proveedoresRegistrados', {
+                    consultar_Proveedor,
+                    titulo: "Registro de proveedores",
+                    enc: "Proveedores registrados",
+                });
+
+                const consultar_User = await usuarioModel.findAll();
+                req.session.userRole = 'Empleado';
+                res.render('usuariosRegistrados', {
+                    consultar_User,
+                    titulo: "Registro de usuarios",
+                    enc: "Usuarios registrados",
+                });
             }
-        } else if (cliente) {
-            if (cliente.Contrasena === password) {
-                res.render('productos', { titulo: "Productos", enc: 'Registro de clientes' });
-            } else {
-                res.send('Contraseña incorrecta');
-            }
-        } else {
-            res.send('Usuario o cliente no encontrado');
         }
+
+        if (cliente) {
+            const validarContraCliente = await compare(Contrasena, cliente.Contrasena);
+                if (validarContraCliente) {
+                    req.session.userRole = 'Cliente';
+                            res.render('productos', {
+                                titulo: "Página principal",
+                                enc: "Productos",
+                            });
+                        }
+                    }
+
+        res.render('login', {
+            titulo: "Login",
+            enc: "Inicia sesión"
+        });
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error al iniciar sesión:', error);
         res.status(500).send('Error interno del servidor');
     }
-}
+};
+
 /*                                           Fin de controladores generales                                     */
 /*                                           CRUD Usuarios                                     */
 /*Ingreso al formulario para registro de usuarios*/
-const registroUsuarios = (req, res)=>{//cada que se ponga la ruta raiz responde el router/para poder usar dicha ruta raiz se debe exportar
+const registroUsuarios = (req, res)=>{
     res.render('registroUsuarios', 
     {titulo:'Registro de usuarios', 
     enc:'Registro de usuarios', 
@@ -101,20 +132,23 @@ const formularioActualizacion = (req, res) => {
 /*Controlador para creación de usuarios*/
 const altasUsuario = async (req, res) => {
     try {
-        const datosUsuario = {
-            Nombre: req.body.Nombre,
-            Apellido: req.body.Apellido,
-            Direccion: req.body.Direccion,
-            Edad: req.body.Edad,
-            Fecha_nacimiento: req.body.Fecha_nacimiento,
-            Telefono: req.body.Telefono,
-            Correo: req.body.Correo,
-            Rol: req.body.Rol,
-            Nombre_usuario: req.body.Nombre_usuario,
-            Contrasena: req.body.Contrasena,
-        };
+        const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Telefono, Correo, Rol, Nombre_usuario, Contrasena} = req.body
+        const todoslosdatos = req.body
 
-        const nuevoUsuario = await usuarioModel.create(datosUsuario);
+
+        const passwordHash = await encrypt(Contrasena)
+        const nuevoUsuario = await usuarioModel.create({
+            Nombre,
+            Apellido,
+            Direccion,
+            Edad,
+            Fecha_nacimiento,
+            Telefono,
+            Correo,
+            Rol,
+            Nombre_usuario,
+            Contrasena: passwordHash
+        });
 
         console.log('Nuevo usuario creado:', nuevoUsuario.toJSON());
         res.render('registroUsuarios',{
@@ -151,7 +185,6 @@ const actualizarUsuario = async (req, res) => {
 }
 
 
-
 /*Controlador para baja de usuarios*/
 const eliminarUsuario = async (req, res) => {
     const valores = req.params.id;
@@ -163,12 +196,12 @@ const eliminarUsuario = async (req, res) => {
         }
 
         await user.destroy();
-        const consultar_User = await usuarioModel.findAll();
+        const consultar_Cliente = await usuarioModel.findAll();
 
-        res.render('usuariosRegistrados',
-            {consultar_User,
-            titulo:'Usuarios registrados', 
-            enc:'Usuarios registrados'});
+        res.render('clientesRegistrados',
+            {consultar_Cliente,
+            titulo:'Clientes registrados', 
+            enc:'Clientes registrados'});
     } catch (error) {
         console.error('Error al eliminar usuario:', error);
         res.status(500).send('Error interno del servidor');
@@ -188,7 +221,7 @@ const consultasUsuarios = async (req, res) => {
 /*                                            Fin CRUD Usuarios                                         */
 
 /*                                           CRUD Clientes                                     */
-const registroClientes = (req, res)=>{//cada que se ponga la ruta raiz responde el router/para poder usar dicha ruta raiz se debe exportar
+const registroClientes = (req, res)=>{
     res.render('registroClientes', 
     {titulo:'Registro de clientes', 
     enc:'Registro de clientes', 
@@ -197,19 +230,23 @@ const registroClientes = (req, res)=>{//cada que se ponga la ruta raiz responde 
 
 const altasClientes = async (req, res) => {
     try {
-        const datosCliente = {
-            Nombre: req.body.Nombre,
-            Apellido: req.body.Apellido,
-            Direccion: req.body.Direccion,
-            Edad: req.body.Edad,
-            Fecha_nacimiento: req.body.Fecha_nacimiento,
-            Telefono: req.body.Telefono,
-            Correo: req.body.Correo,
-            Nombre_usuario: req.body.Nombre_usuario,
-            Contrasena: req.body.Contrasena,
-        };
 
-        const nuevoCliente = await clienteModel.create(datosCliente);
+    const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Telefono, Correo, Rol, Nombre_usuario, Contrasena} = req.body
+
+
+        const passwordHash = await encrypt(Contrasena)
+        const nuevoCliente = await clienteModel.create({
+            Nombre,
+            Apellido,
+            Direccion,
+            Edad,
+            Fecha_nacimiento,
+            Telefono,
+            Correo,
+            Rol,
+            Nombre_usuario,
+            Contrasena: passwordHash
+        });
 
         console.log('Nuevo cliente creado:', nuevoCliente.toJSON());
         res.render('registroClientes');
@@ -521,6 +558,8 @@ const eliminarProveedor = async (req, res) => {
 /*                                           Fin CRUD Proveedores                                     */
 
 module.exports = {
+    productos,
+    inicioSesion,
     altasUsuario, 
     registroUsuarios,
     formularioActualizacion,
@@ -545,6 +584,5 @@ module.exports = {
     actualizacionProveedor,
     actualizarProveedor,
     eliminarProveedor,
-    Login,
-    inicioSesion
+    Login
 }

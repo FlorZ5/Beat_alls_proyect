@@ -56,4 +56,5 @@ const usuarioModel = db.define('usuario', {
     timestamps: false
 });
 
+
 module.exports = usuarioModel;

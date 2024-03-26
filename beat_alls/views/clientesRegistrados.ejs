@@ -26,7 +26,6 @@
                 <th>Telefono</th>
                 <th>Correo electrónico</th>
                 <th>Nombre de usuario</th>
-                <th>Contraseña</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -42,7 +41,6 @@
                     <td><%= cliente.Telefono %></td>
                     <td><%= cliente.Correo %></td>
                     <td><%= cliente.Nombre_usuario %></td>
-                    <td><%= cliente.Contrasena %></td>
                     <td>
                         <a href="/clientesRegistrados/<%= cliente.ID_Cliente %>">Borrar</a>
                         <a href="/actualizacionClientes?id=<%= cliente.ID_Cliente %>&nombre=<%= cliente.Nombre %>&apellido=<%= cliente.Apellido %>&direccion=<%= cliente.Direccion %>&edad=<%= cliente.Edad %>&fechaNacimiento=<%= cliente.Fecha_nacimiento %>&telefono=<%= cliente.Telefono %>&correo=<%= cliente.Correo %>&nombreUsuario=<%= cliente.Nombre_usuario %>&contrasena=<%= cliente.Contrasena %>">Actualizar</a>

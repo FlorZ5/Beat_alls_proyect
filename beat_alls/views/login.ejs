@@ -6,39 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= titulo %></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/stilo.css">
+    <link rel="stylesheet" href="/css/stilo.css">
 </head>
 <body>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <%- include('./layout/header.ejs'); -%>
             <br><br>
             <center>
-          <form action="/inicioSesion" method="post">
-            <div class="container">
-                <form method="" autocomplete="on" action="" class="col-lg-6 col-md-12 col-sm-12"><br><br>
-                    <center><h1><%= enc %></h1></center><br>
-                    <div class="row">
-                      <center>
-                        <div class="col-lg-8 col-md-12 col-sm-12">
-                          <input class="form-control" type="text" placeholder="Correo Electrónico o Nombre de usuario" name="login" id="login">
-                        </div>
-                      </center>
-                    </div> <br>
-                    <div class="row">
-                      <center>
-                        <div class="col-lg-8 col-md-12 col-sm-12">
-                          <input class="form-control" type="password" placeholder="Contraseña" name="password" id="password" >
+              <form action="/login" method="post">
+                <div class="container">
+                    <form method="" autocomplete="on" action="" class="col-lg-6 col-md-12 col-sm-12"><br><br>
+                        <center><h1><%= enc %></h1></center><br>
+                        <div class="row">
+                            <center>
+                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                    <input class="form-control" type="text" placeholder="Correo Electrónico o Nombre de usuario" name="Login" id="login">
+                                </div>
+                            </center>
+                        </div> <br>
+                        <div class="row">
+                            <center>
+                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                  <input class="form-control" type="password" placeholder="Contraseña" name="Contrasena" id="password">
+
+                                </div> 
+                            </center>
+                        </div><br>
+                        <div class="row">
+                            <center> <button type="submit" class="btn btn-info">Entrar</button></center>
                         </div> 
-                      </center>
-                    </div><br>
-                    <div class="row">
-                      <center> <button type="submit" class="btn btn-info">Entrar</button></center>
-                    </div> 
-                    <br><br>
-                </form>
-                </div> 
-            </div>
-          </form>
+                      <br><br>
+                    </form>
+                </div>
+            </form>            
           </center>
           <%- include('./layout/footer.ejs'); -%>
           <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
