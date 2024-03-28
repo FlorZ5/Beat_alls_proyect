@@ -20,27 +20,27 @@ router.post("/registroUsuarios", authorizationMiddleware, paginas.altasUsuario);
 
 router.get("/formularioActualizacion", authorizationMiddleware, paginas.formularioActualizacion);
 
-router.post("/usuariosRegistrados/:id", paginas.actualizarUsuario);
+router.post("/usuariosRegistrados/:id", authorizationMiddleware, paginas.actualizarUsuario);
 
-router.get("/usuariosRegistrados/:id", paginas.eliminarUsuario);
+router.get("/usuariosRegistrados/:id", authorizationMiddleware, paginas.eliminarUsuario);
 /* Aquí terminan las rutas del CRUD usuarios */
 
 /* Aquí inician las rutas del CRUD clientes */
-router.get("/registroClientes", paginas.registroClientes);
+router.get("/registroClientes", authorizationMiddleware, paginas.registroClientes);
 
-router.post("/registroClientes", paginas.altasClientes);
+router.post("/registroClientes", authorizationMiddleware, paginas.altasClientes);
 
-router.get("/clientesRegistrados", paginas.consultasClientes);
+router.get("/clientesRegistrados", authorizationMiddleware, paginas.consultasClientes);
 
-router.get("/actualizacionClientes", paginas.actualizacionCliente);
+router.get("/actualizacionClientes", authorizationMiddleware, paginas.actualizacionCliente);
 
-router.post("/clientesRegistrados/:id", paginas.actualizarCliente);
+router.post("/clientesRegistrados/:id", authorizationMiddleware, paginas.actualizarCliente);
 
-router.get("/clientesRegistrados/:id", paginas.eliminarCliente);
+router.get("/clientesRegistrados/:id", authorizationMiddleware, paginas.eliminarCliente);
 /* Aquí terminan las rutas del CRUD clientes */
 
 /* Aquí inician las rutas del CRUD productos */
-router.get("/registroProductos", paginas.registroProductos);
+router.get("/registroProductos", authorizationMiddleware, paginas.registroProductos);
 
 router.post("/registroProductos", paginas.altasProductos);
 
@@ -54,7 +54,7 @@ router.get("/productosRegistrados/:id", paginas.eliminarProducto);
 /* Aquí terminan las rutas del CRUD productos */
 
 /* Aquí inician las rutas del CRUD proveedores */
-router.get("/registroProveedores", paginas.registroProveedores);
+router.get("/registroProveedores", authorizationMiddleware, paginas.registroProveedores);
 
 router.post("/registroProveedores", authorizationMiddleware, paginas.altasProveedores);
 

@@ -1,7 +1,6 @@
 const db = require('../config/db.js');
 const {Op, sequelize, where} = require('sequelize');
 const {encrypt, compare} = require('../helpers/handleBcrypt.js');
-const { generateToken } = require('../helpers/generateToken');
 const jwt = require('jsonwebtoken');
 const usuarioModel = require('../models/usuarioModel.js');
 const clienteModel = require('../models/clienteModel.js');
@@ -29,8 +28,6 @@ const Login = (req, res) => {
 const inicioSesion = async (req, res) => {
     try {
         const { Login, Contrasena } = req.body;
-        const valorAdmin = "Administrador";
-        const valorEmpleado = "Empleado";
         const usuario = await usuarioModel.findOne({ where: { 
             [Op.or]: [{Nombre_usuario: Login}, {Correo: Login}] 
         }});
@@ -49,30 +46,42 @@ const inicioSesion = async (req, res) => {
 
         if (usuario) {
             const validarContraUsuario = await compare(Contrasena, usuario.Contrasena);
+            const header = './layout/headerAdministrador.ejs';
             if (validarContraUsuario) {
+                if(usuario.dataValues.Rol == "Administrador")
+                {
                 const consultar_Proveedor = await proveedorModel.findAll();
                 req.session.userRole = 'Administrador';
                 res.render('proveedoresRegistrados', {
+                    header,
                     consultar_Proveedor,
                     titulo: "Registro de proveedores",
                     enc: "Proveedores registrados",
                 });
+            }
 
-                const consultar_User = await usuarioModel.findAll();
-                req.session.userRole = 'Empleado';
-                res.render('usuariosRegistrados', {
+                if(usuario.dataValues.Rol == "Empleado")
+                {
+                    const header = './layout/header.ejs';
+                    const consultar_User = await usuarioModel.findAll();
+                    req.session.userRole = 'Empleado';
+                    res.render('usuariosRegistrados', {
+                    header,
                     consultar_User,
                     titulo: "Registro de usuarios",
                     enc: "Usuarios registrados",
                 });
+                }
             }
         }
 
         if (cliente) {
             const validarContraCliente = await compare(Contrasena, cliente.Contrasena);
                 if (validarContraCliente) {
+                    const header = './layout/header.ejs';
                     req.session.userRole = 'Cliente';
                             res.render('productos', {
+                                header,
                                 titulo: "Página principal",
                                 enc: "Productos",
                             });
