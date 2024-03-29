@@ -10,7 +10,6 @@
 </head>
 <body>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <%- include('./layout/header.ejs'); -%>
             <br><br>
             <center>
               <form action="/login" method="post">
@@ -35,7 +34,10 @@
                         <div class="row">
                             <center> <button type="submit" class="btn btn-info">Entrar</button></center>
                         </div> 
-                      <br><br>
+                      <br>
+                      <div class="row">
+                        <center> <button class="btn btn-info"><a href="/registroClientes">¿No tienes usuario?</a></button></center>
+                    </div> 
                     </form>
                 </div>
             </form>            

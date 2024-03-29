@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const paginas = require('../controllers/paginasController.js');
-const authorizationMiddleware = require('../middlewares/authorizationMiddleware.js')
+const authorizationMiddleware = require('../middlewares/authorizationMiddleware.js');
+const cargas = require('../controllers/upload.js')
 
 
-/*Rutas naturales*/
+/*Rutas naturaleAs*/
 router.get("/productos", paginas.productos);
 /* Login */
 router.get("/login", paginas.Login); // Obtener el formulario de Login.
@@ -26,9 +27,9 @@ router.get("/usuariosRegistrados/:id", authorizationMiddleware, paginas.eliminar
 /* Aquí terminan las rutas del CRUD usuarios */
 
 /* Aquí inician las rutas del CRUD clientes */
-router.get("/registroClientes", authorizationMiddleware, paginas.registroClientes);
+router.get("/registroClientes", paginas.registroClientes);
 
-router.post("/registroClientes", authorizationMiddleware, paginas.altasClientes);
+router.post("/registroClientes", paginas.altasClientes);
 
 router.get("/clientesRegistrados", authorizationMiddleware, paginas.consultasClientes);
 
@@ -42,7 +43,7 @@ router.get("/clientesRegistrados/:id", authorizationMiddleware, paginas.eliminar
 /* Aquí inician las rutas del CRUD productos */
 router.get("/registroProductos", authorizationMiddleware, paginas.registroProductos);
 
-router.post("/registroProductos", paginas.altasProductos);
+router.post("/registroProductos", cargas.upload, paginas.altasProductos);
 
 router.get("/productosRegistrados", paginas.consultasProductos);
 

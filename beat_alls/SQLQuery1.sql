@@ -9,7 +9,8 @@ Apellido Varchar(30) not null,
 Direccion Varchar(75) not null, 
 Edad smallint not null,
 Telefono bigint not null unique, 
-Correo Varchar (30) not null unique, 
+Correo Varchar (30) not null unique,
+Rol Varchar (25) not null,
 Nombre_usuario Varchar (15) not null unique, 
 Contrasena Varchar (150) not null
 );
@@ -36,6 +37,7 @@ Marca Varchar(25) not null,
 Temporada Varchar (30) not null,
 Existencias smallint not null,
 ID_Proveedor Int not null,
+URL_IMG varchar(300) not null,
 constraint fk_proveedor foreign key (ID_Proveedor) references Proveedor
 );
 go

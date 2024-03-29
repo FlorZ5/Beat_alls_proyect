@@ -1,7 +1,7 @@
 const db = require('../config/db.js');
 const {Op, sequelize, where} = require('sequelize');
 const {encrypt, compare} = require('../helpers/handleBcrypt.js');
-const jwt = require('jsonwebtoken');
+const upload = require('../app.js');
 const usuarioModel = require('../models/usuarioModel.js');
 const clienteModel = require('../models/clienteModel.js');
 const productosModel = require('../models/productosModel.js');
@@ -10,11 +10,14 @@ const { use } = require('../routes/rutas.js');
 
 
 
-const productos = (req, res) => {
-    res.render('productos', {
-        titulo: "Tienda",
-        enc: "Productos"
-    })
+const productos = async (req, res) => {
+        consultar_Productos = await productosModel.findAll();
+
+        res.render('productos', {
+            consultar_Productos,
+            titulo: "Tienda",
+            enc: "Productos"
+        })
 }
 /*Controladores generales*/
 /*Controlador para acceder al login*/
@@ -142,7 +145,6 @@ const formularioActualizacion = (req, res) => {
 const altasUsuario = async (req, res) => {
     try {
         const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Telefono, Correo, Rol, Nombre_usuario, Contrasena} = req.body
-        const todoslosdatos = req.body
 
 
         const passwordHash = await encrypt(Contrasena)
@@ -173,15 +175,26 @@ const altasUsuario = async (req, res) => {
 /*Controlador para actualización de usuarios*/
 const actualizarUsuario = async (req, res) => {
     const userId = req.params.id;
-    const newData = req.body;
+    const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Telefono, Correo, Rol, Nombre_usuario, Contrasena} = req.body
 
     try {
         // Buscar el usuario existente
         const usuario = await usuarioModel.findByPk(userId);
 
         if (usuario) {
-            // Actualizar los campos del usuario con los nuevos datos
-            await usuario.update(newData);
+            const passwordHash = await encrypt(Contrasena)
+            await usuario.update({
+                Nombre,
+                Apellido,
+                Direccion,
+                Edad,
+                Fecha_nacimiento,
+                Telefono,
+                Correo,
+                Rol,
+                Nombre_usuario,
+                Contrasena: passwordHash
+            });
             console.log('Usuario actualizado:', usuario.toJSON());
             res.redirect('/usuariosRegistrados'); // Redirigir a la página de usuarios después de actualizar
         } else {
@@ -303,16 +316,25 @@ const actualizacionCliente = (req, res) => {
 
 const actualizarCliente = async (req, res) => {
     const clienteId = req.params.id;
-    console.log(clienteId);
-    const newData = req.body;
+    const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Telefono, Correo, Nombre_usuario, Contrasena} = req.body;
 
     try {
         // Buscar el usuario existente
         const cliente = await clienteModel.findByPk(clienteId);
-
+        const passwordHash = await encrypt(Contrasena)
         if (cliente) {
             // Actualizar los campos del usuario con los nuevos datos
-            await cliente.update(newData);
+            await cliente.update({
+                Nombre,
+                Apellido,
+                Direccion,
+                Edad,
+                Fecha_nacimiento,
+                Telefono,
+                Correo,
+                Nombre_usuario,
+                Contrasena: passwordHash
+            });
             console.log('Cliente actualizado:', cliente.toJSON());
             res.redirect('/clientesRegistrados'); // Redirigir a la página de usuarios después de actualizar
         } else {
@@ -357,20 +379,24 @@ const registroProductos = (req, res)=>{//cada que se ponga la ruta raiz responde
 
 const altasProductos = async (req, res) => {
     try {
-        const datosProducto = {
-            Nombre_producto: req.body.Nombre_producto,
-            Descripcion: req.body.Descripcion,
-            Color: req.body.Color,
-            Talla: req.body.Talla,
-            Material: req.body.Material,
-            Marca: req.body.Marca,
-            Temporada: req.body.Temporada,
-            Precio: req.body.Precio,
-            Existencias: req.body.Existencias,
-            ID_Proveedor: req.body.ID_Proveedor,
-        };
+        const {Nombre_producto, Descripcion, Color, Talla, Material, Marca, Temporada, Precio, Existencias, ID_Proveedor} = req.body;
+        const Precio_publico = Precio*1.36;
+        const filepath = req.file.path;
 
-        const nuevoProducto = await productosModel.create(datosProducto);
+        const nuevoProducto = await productosModel.create({
+            Nombre_producto,
+            Descripcion,
+            Color,
+            Talla,
+            Material,
+            Marca,
+            Temporada,
+            Precio,
+            Precio_publico,
+            Existencias,
+            ID_Proveedor,
+            filepath
+        });
 
         console.log('Nuevo producto creado:', nuevoProducto.toJSON());
         res.render('registroProductos');

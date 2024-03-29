@@ -52,6 +52,10 @@ const productosModel = db.define('productos', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
+    filepath: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
 },
 {
     tableName: 'productos',

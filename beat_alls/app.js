@@ -4,20 +4,12 @@ const port = 3000 //se crea un puerto, por donde sale la appp
 const path = require ("path")
 const rutas = require("./routes/rutas")//se importan las rutas para poder mandar llamar a nuestro contenido
 const db = require('./config/db.js')//constante para importar bd
+const multer = require('multer')
 const myConnection = require('express-myconnection');
-const mysql = require('mysql')
 const methodOverride = require('method-override');
 const session = require('express-session')
+const { Sequelize } = require('sequelize')
 /*              Middlewares         */
-//Llamado a la base de datos
-app.use(myConnection(mysql, {
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    port: 3306,
-    database: 'beat_alls'
-}, 'single'));
-
 //Llamado de datos de los form
 app.use(express.urlencoded({extended: true}));
 
@@ -32,6 +24,8 @@ app.use(session({
 
 //Method-override para solicitudes put y delete
 app.use(methodOverride('_method'));
+
+app.use('/uploads', express.static('uploads'));
 
 //Definición de rutas hacia la carpeta public
 app.use(express.static(path.join(__dirname, 'public')));
