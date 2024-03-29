@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= titulo %></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/stilo.css">
+    <link rel="stylesheet" href="/css/stilo.css">
 </head>
 <body>
     <%- include('./layout/header.ejs'); -%>    
@@ -15,32 +15,33 @@
     <br>
     <div class="container"><center>
         <div class="row">
-
-          <!--Empezamos a armar los productos-->
           <table border="1">
             <tbody>
                 <% consultar_Productos.forEach(producto => { %>
                     <tr>
+                      <form action="/agregarAlCarrito" method="post"> 
                           <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="tarjeta" style="border-bottom: 100px;">
                                 <div class="card" style="width: 18rem;">
-                                    <img src="<%- producto.filepath %>" class="card-img-top" alt="<%- producto.Descripcion %>">
+                                    <img height="200" width="200" src="/<%- producto.filepath %>" class="card-img-top" alt="<%- producto.Descripcion %>">
                                     <div class="card-body">
                                       <h6 class="card-title"><%- producto.Nombre_producto %></h6>
                                     </div>
                                     <ul class="list-group list-group-flush">
-                                      <li class="list-group-item"><center><%- producto.Precio_publico %></center></li>                  
+                                      <li class="list-group-item"><center><%- producto.Precio_publico %></center></li>                 
                                     <div class="card-body">
-                                      <center><input type="button" class="btn btn-primary" value="Añadir al carrito"></center>
+                                      <input type="number" name="cantidadPiezas" placeholder="Cantidad" value="1"><br><br>
+                                      <input type="hidden" name="ID_Producto" value="<%- producto.ID_Producto %>">
+                                      <center><input type="submit" class="btn btn-primary" value="Añadir al carrito"></center>
                                     </div>
                                 </div><br><br>
                             </div>
-                            </div>
+                        </div>
+                      </form>
                     </tr>
                 <% }); %>
             </tbody>
         </table>
-          <!--Hasta aquí llegan-->
     <%- include('./layout/footer.ejs'); -%>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>

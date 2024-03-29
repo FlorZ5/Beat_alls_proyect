@@ -12,6 +12,14 @@ router.get("/login", paginas.Login); // Obtener el formulario de Login.
 
 router.post("/login", paginas.inicioSesion); // Realiza el inicio de sesión
 
+router.get('/logout', paginas.logOut);
+
+/*Carrito*/
+
+router.get('/visualizarCarrito', paginas.visualizarCarrito);
+
+router.post('/agregarAlCarrito', paginas.agregarAlCarrito);
+
 /* Aquí inician las rutas del CRUD usuarios */
 router.get("/usuariosRegistrados", authorizationMiddleware, paginas.consultasUsuarios);
 

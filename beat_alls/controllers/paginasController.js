@@ -1,17 +1,16 @@
 const db = require('../config/db.js');
 const {Op, sequelize, where} = require('sequelize');
 const {encrypt, compare} = require('../helpers/handleBcrypt.js');
-const upload = require('../app.js');
 const usuarioModel = require('../models/usuarioModel.js');
 const clienteModel = require('../models/clienteModel.js');
 const productosModel = require('../models/productosModel.js');
 const proveedorModel = require('../models/proveedorModel.js');
-const { use } = require('../routes/rutas.js');
+const carritoModel = require('../models/carritoModel.js');
 
 
 
 const productos = async (req, res) => {
-        consultar_Productos = await productosModel.findAll();
+        const consultar_Productos = await productosModel.findAll();
 
         res.render('productos', {
             consultar_Productos,
@@ -43,7 +42,7 @@ const inicioSesion = async (req, res) => {
         if (!usuario && !cliente) {
             return res.status(404).render('login', {
                 titulo: "Login",
-                enc: "Inicia sesión"
+                enc: "Inicio de sesión"
             });
         }          
 
@@ -55,6 +54,7 @@ const inicioSesion = async (req, res) => {
                 {
                 const consultar_Proveedor = await proveedorModel.findAll();
                 req.session.userRole = 'Administrador';
+                req.session.usuario = usuario;
                 res.render('proveedoresRegistrados', {
                     header,
                     consultar_Proveedor,
@@ -68,6 +68,7 @@ const inicioSesion = async (req, res) => {
                     const header = './layout/header.ejs';
                     const consultar_User = await usuarioModel.findAll();
                     req.session.userRole = 'Empleado';
+                    req.session.usuario = usuario;
                     res.render('usuariosRegistrados', {
                     header,
                     consultar_User,
@@ -81,9 +82,12 @@ const inicioSesion = async (req, res) => {
         if (cliente) {
             const validarContraCliente = await compare(Contrasena, cliente.Contrasena);
                 if (validarContraCliente) {
+                    const consultar_Productos = await productosModel.findAll();
                     const header = './layout/header.ejs';
                     req.session.userRole = 'Cliente';
+                    req.session.cliente = cliente;
                             res.render('productos', {
+                                consultar_Productos,
                                 header,
                                 titulo: "Página principal",
                                 enc: "Productos",
@@ -93,7 +97,7 @@ const inicioSesion = async (req, res) => {
 
         res.render('login', {
             titulo: "Login",
-            enc: "Inicia sesión"
+            enc: "Inicio de sesión"
         });
     } catch (error) {
         console.error('Error al iniciar sesión:', error);
@@ -101,7 +105,88 @@ const inicioSesion = async (req, res) => {
     }
 };
 
+const logOut = (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error al cerrar sesión:', err);
+        res.status(500).send('Error al cerrar sesión');
+      } else {
+        res.render('login', {
+            titulo: "Login",
+            enc: "Inicio de sesión"
+        })
+      }
+    });
+  };
+
 /*                                           Fin de controladores generales                                     */
+
+/*                                           Inicio de controladores para el carrito                                     */
+
+const agregarAlCarrito = async (req, res) => {
+    const usuarioLogueado = req.session.cliente;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+
+    const idCliente = usuarioLogueado.ID_Cliente;
+    const idProducto = req.body.ID_Producto;
+
+
+    let carritoProducto = await carritoModel.findOne({
+        where: {
+            ID_Cliente: idCliente,
+            ID_Producto: idProducto
+        }
+    });
+
+    let cantidadPiezas = parseInt(req.body.cantidadPiezas) || 1;
+
+    if (carritoProducto) {
+        const valorBack =  await carritoProducto.Nombre_producto;
+        console.log("Este es carrito producto",  carritoProducto.Nombre_producto, "El back", valorBack)
+        carritoProducto.Cantidad_producto += cantidadPiezas;
+        carritoModel.update({ Cantidad_producto: cantidadPiezas },
+            {where: {Nombre_producto: valorBack}
+        })
+    } else {
+        const productoAgregado = await productosModel.findByPk(idProducto);
+
+        await carritoModel.create({
+            ID_Cliente: idCliente,
+            ID_Producto: idProducto,
+            Nombre_producto: productoAgregado.Nombre_producto,
+            Descripcion: productoAgregado.Descripcion,
+            Cantidad_producto: cantidadPiezas,
+            Precio_unitario_producto: productoAgregado.Precio_publico,
+            Precio_total_productos: productoAgregado.Precio_publico * cantidadPiezas,
+            Cantidad_pagar: productoAgregado.Precio_publico * cantidadPiezas
+        });
+    }
+
+    const consultar_Productos = await productosModel.findAll();
+
+    res.render('productos', {
+        consultar_Productos,
+        titulo: "Productos",
+        enc: "Productos"
+    });
+};
+
+
+
+const visualizarCarrito = async (req, res) => {
+    const consultar_Carrito = await carritoModel.findAll();
+
+    res.render('carritoCliente', {
+        consultar_Carrito,
+        titulo: "Carrito",
+        enc: "Mi carrito"
+    })
+}
+
+/*                                           Fin de controladores para el carrito                                     */
 /*                                           CRUD Usuarios                                     */
 /*Ingreso al formulario para registro de usuarios*/
 const registroUsuarios = (req, res)=>{
@@ -380,7 +465,7 @@ const registroProductos = (req, res)=>{//cada que se ponga la ruta raiz responde
 const altasProductos = async (req, res) => {
     try {
         const {Nombre_producto, Descripcion, Color, Talla, Material, Marca, Temporada, Precio, Existencias, ID_Proveedor} = req.body;
-        const Precio_publico = Precio*1.36;
+        const Precio_publico = Precio*2;
         const filepath = req.file.path;
 
         const nuevoProducto = await productosModel.create({
@@ -619,5 +704,8 @@ module.exports = {
     actualizacionProveedor,
     actualizarProveedor,
     eliminarProveedor,
-    Login
+    Login,
+    logOut,
+    agregarAlCarrito,
+    visualizarCarrito
 }

@@ -1,10 +1,13 @@
-const {Sequelize, DataTypes}  = require('sequelize'); //trae el squelize
-const db = require('../config/db.js');//trae la conexion con la bd
+const {Sequelize, DataTypes}  = require('sequelize');
+const db = require('../config/db.js');
 
 const carritoModel = db.define('carrito', {
     ID_Carrito:{
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        primaryKey: true,
+        autoIncrement: false,
+        defaultValue: 1
     },
     ID_Cliente:{
         type: DataTypes.INTEGER,

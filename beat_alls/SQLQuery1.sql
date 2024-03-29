@@ -37,7 +37,7 @@ Marca Varchar(25) not null,
 Temporada Varchar (30) not null,
 Existencias smallint not null,
 ID_Proveedor Int not null,
-URL_IMG varchar(300) not null,
+filepath varchar(300) not null,
 constraint fk_proveedor foreign key (ID_Proveedor) references Proveedor
 );
 go
