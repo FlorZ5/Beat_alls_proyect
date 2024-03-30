@@ -145,11 +145,17 @@ const agregarAlCarrito = async (req, res) => {
 
     if (carritoProducto) {
         const valorBack =  await carritoProducto.Nombre_producto;
-        console.log("Este es carrito producto",  carritoProducto.Nombre_producto, "El back", valorBack)
         carritoProducto.Cantidad_producto += cantidadPiezas;
+        const publicPrice = await carritoProducto.Precio_unitario_producto;
+        let nuevoValor =  cantidadPiezas * publicPrice;
         carritoModel.update({ Cantidad_producto: cantidadPiezas },
-            {where: {Nombre_producto: valorBack}
-        })
+            {where: { Nombre_producto: valorBack,
+                      ID_Cliente: idCliente
+        }})
+        carritoModel.update({ Precio_total_productos: nuevoValor },
+            {where: {Nombre_producto: valorBack,
+                     ID_Cliente: idCliente                            
+        }})
     } else {
         const productoAgregado = await productosModel.findByPk(idProducto);
 
@@ -177,7 +183,17 @@ const agregarAlCarrito = async (req, res) => {
 
 
 const visualizarCarrito = async (req, res) => {
-    const consultar_Carrito = await carritoModel.findAll();
+    const usuarioLogueado = req.session.cliente;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+    const idCliente = usuarioLogueado.ID_Cliente;
+    const consultar_Carrito = await carritoModel.findAll({ where: {
+        ID_Cliente: idCliente 
+    }});
+
+    console.log("Este es el ID de la sesión", idCliente, "Esta es la consulta findOne: ", consultar_Carrito)
 
     res.render('carritoCliente', {
         consultar_Carrito,
@@ -303,12 +319,12 @@ const eliminarUsuario = async (req, res) => {
         }
 
         await user.destroy();
-        const consultar_Cliente = await usuarioModel.findAll();
+        const consultar_User = await usuarioModel.findAll();
 
-        res.render('clientesRegistrados',
-            {consultar_Cliente,
-            titulo:'Clientes registrados', 
-            enc:'Clientes registrados'});
+        res.render('usuariosRegistrados',
+            {consultar_User,
+            titulo:'Usuarios registrados', 
+            enc:'Usuarios registrados'});
     } catch (error) {
         console.error('Error al eliminar usuario:', error);
         res.status(500).send('Error interno del servidor');
@@ -441,7 +457,7 @@ const eliminarCliente = async (req, res) => {
         }
 
         await cliente.destroy();
-        const consultar_Cliente = await usuarioModel.findAll();
+        const consultar_Cliente = await clienteModel.findAll();
 
         res.render('clientesRegistrados',
             {consultar_Cliente,
