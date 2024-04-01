@@ -18,29 +18,33 @@
         <thead>
             <tr>
                 <th>Nombre</th>
+                <th>Descripción</th>
                 <th>Cantidad</th>
                 <th>Precio unitario</th>
                 <th>Acumulado</th>
+                <td>Total a pagar</td>
+                <td>Metodo de pago</td>
             </tr>
         </thead>
         <tbody>
             <% consultar_Carrito.forEach(carrito => { %>
                 <tr>
                     <td><%= carrito.Nombre_producto %></td>
+                    <td><%= carrito.Descripcion %></td>
                     <td><%= carrito.Cantidad_producto %></td>
                     <td><%= carrito.Precio_unitario_producto %></td>
                     <td><%= carrito.Precio_total_productos %></td>
+            <% }); %>
+                    <td><%= totalPagar %></td>
                     <td>
-                        <a href="/eliminarProductoCarrito/<%= carrito.ID_Producto %>">Borrar</a>
+                        <select name="tipoPago" id="tipoPago">
+                        <option value="">Efectivo</option>
+                        <option value="">Transferecia</option>
+                    </select>
                     </td>
                 </tr>
-            <% }); %>
             <tr>
-                <td>Total a pagar</td>
-                <td><%= totalPagar %></td>
-            </tr>
-            <tr>
-                <td><a href="/enviarCarrito">Continuar compra</a></td>
+                <td><a href="/crearPedido">Finalizar pedido</a></td>
             </tr>
         </tbody>
     </table>

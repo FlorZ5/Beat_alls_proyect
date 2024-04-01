@@ -4,11 +4,13 @@ const db = require('../config/db.js');//trae la conexion con la bd
 const pedidosModel = db.define('pedidos', {
     No_pedido:{
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        primaryKey: false
     },
     ID_Cliente:{
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        primaryKey: false
     },
     Nombre_cliente:{
         type: DataTypes.STRING,
@@ -44,7 +46,8 @@ const pedidosModel = db.define('pedidos', {
     },
     Ubicacion:{
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        defaultValue: "Aguascalientes"
     },
     Fecha:{
         type: DataTypes.DATE,
@@ -61,4 +64,4 @@ const pedidosModel = db.define('pedidos', {
 }
 )
 
-module.exports = usuarioModel;
+module.exports = pedidosModel;

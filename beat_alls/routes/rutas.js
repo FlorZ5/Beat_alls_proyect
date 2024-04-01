@@ -14,11 +14,25 @@ router.post("/login", paginas.inicioSesion); // Realiza el inicio de sesión
 
 router.get('/logout', paginas.logOut);
 
-/*Carrito*/
+/*Aquí inicia el carrito*/
 
 router.get('/visualizarCarrito', paginas.visualizarCarrito);
 
 router.post('/agregarAlCarrito', paginas.agregarAlCarrito);
+
+router.get('/eliminarProductoCarrito/:id', paginas.eliminarProductoCarrito);
+
+router.get('/enviarCarrito', paginas.enviarCarrito);
+
+/*Aquí finaliza el carrito*/
+
+/*Aquí inician los pedidos*/
+
+router.get('/crearPedido', paginas.crearPedido);
+
+router.get('/visualizarPedido', paginas.visualizarPedido);
+
+/*Aquí finalizan los pedidos*/
 
 /* Aquí inician las rutas del CRUD usuarios */
 router.get("/usuariosRegistrados", authorizationMiddleware, paginas.consultasUsuarios);

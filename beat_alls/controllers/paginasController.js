@@ -6,6 +6,7 @@ const clienteModel = require('../models/clienteModel.js');
 const productosModel = require('../models/productosModel.js');
 const proveedorModel = require('../models/proveedorModel.js');
 const carritoModel = require('../models/carritoModel.js');
+const pedidosModel = require('../models/pedidosModel.js');
 
 
 
@@ -142,13 +143,21 @@ const agregarAlCarrito = async (req, res) => {
     });
 
     let cantidadPiezas = parseInt(req.body.cantidadPiezas) || 1;
-
+    const consultar_Carrito = await carritoModel.findAll({ where: {
+        ID_Cliente: idCliente 
+    }});
     if (carritoProducto) {
         const valorBack =  await carritoProducto.Nombre_producto;
         carritoProducto.Cantidad_producto += cantidadPiezas;
         const publicPrice = await carritoProducto.Precio_unitario_producto;
+        const totalPagar = consultar_Carrito.reduce((total, carrito) => total + carrito.Precio_total_productos, 0);
+
         let nuevoValor =  cantidadPiezas * publicPrice;
         carritoModel.update({ Cantidad_producto: cantidadPiezas },
+            {where: { Nombre_producto: valorBack,
+                      ID_Cliente: idCliente
+        }})
+        carritoModel.update({ Cantidad_pagar: totalPagar },
             {where: { Nombre_producto: valorBack,
                       ID_Cliente: idCliente
         }})
@@ -158,6 +167,7 @@ const agregarAlCarrito = async (req, res) => {
         }})
     } else {
         const productoAgregado = await productosModel.findByPk(idProducto);
+        const totalPagar = consultar_Carrito.reduce((total, carrito) => total + carrito.Precio_total_productos, 0);
 
         await carritoModel.create({
             ID_Cliente: idCliente,
@@ -167,20 +177,21 @@ const agregarAlCarrito = async (req, res) => {
             Cantidad_producto: cantidadPiezas,
             Precio_unitario_producto: productoAgregado.Precio_publico,
             Precio_total_productos: productoAgregado.Precio_publico * cantidadPiezas,
-            Cantidad_pagar: productoAgregado.Precio_publico * cantidadPiezas
+            Cantidad_pagar: totalPagar
         });
     }
 
+    const totalPagar = consultar_Carrito.reduce((total, carrito) => total + carrito.Precio_total_productos, 0);
     const consultar_Productos = await productosModel.findAll();
+    
 
     res.render('productos', {
+        totalPagar,
         consultar_Productos,
         titulo: "Productos",
         enc: "Productos"
     });
 };
-
-
 
 const visualizarCarrito = async (req, res) => {
     const usuarioLogueado = req.session.cliente;
@@ -193,16 +204,219 @@ const visualizarCarrito = async (req, res) => {
         ID_Cliente: idCliente 
     }});
 
-    console.log("Este es el ID de la sesión", idCliente, "Esta es la consulta findOne: ", consultar_Carrito)
+    const totalPagar = consultar_Carrito.reduce((total, carrito) => total + carrito.Precio_total_productos, 0);
 
     res.render('carritoCliente', {
+        totalPagar,
         consultar_Carrito,
         titulo: "Carrito",
         enc: "Mi carrito"
     })
-}
+};
+
+const eliminarProductoCarrito = async (req, res) => {
+
+    const usuarioLogueado = req.session.cliente;
+    const idCliente = usuarioLogueado.ID_Cliente;
+    const idProducto = req.params.id;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+
+    try {
+        const carrito = await carritoModel.findOne({
+            where: {
+                ID_Cliente: idCliente,
+                ID_Producto: idProducto
+            }
+        });
+        const valorBack =  await carrito.Nombre_producto;
+        if (!carrito) {
+            return res.status(404).send('Producto encontrado');
+        }
+
+        await carritoModel.destroy({
+            where: {
+                ID_Cliente: idCliente,
+                Nombre_producto: valorBack,
+                ID_Producto: idProducto
+            }
+        });
+        const consultar_Carrito = await carritoModel.findAll({ where: {
+            ID_Cliente: idCliente 
+        }});
+        const totalPagar = consultar_Carrito.reduce((total, carrito) => total + carrito.Precio_total_productos, 0);
+
+        res.render('carritoCliente',{
+            totalPagar,
+            consultar_Carrito,
+            titulo:'Usuarios registrados', 
+            enc:'Usuarios registrados'});
+    } catch (error) {
+        console.error('Error al eliminar usuario:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+};
+
+const enviarCarrito = async (req, res) => {
+
+    const usuarioLogueado = req.session.cliente;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+    const idCliente = usuarioLogueado.ID_Cliente;
+    const consultar_Carrito = await carritoModel.findAll({ where: {
+        ID_Cliente: idCliente 
+    }});
+    const totalPagar = consultar_Carrito.reduce((total, carrito) => total + carrito.Precio_total_productos, 0);
+
+    res.render('crearPedido', {
+        totalPagar,
+        consultar_Carrito,
+        titulo: "Pedido generado",
+        enc: "Tu pedido"
+    })
+};
 
 /*                                           Fin de controladores para el carrito                                     */
+
+/*                                           Inicio de controladores para los pedidos                                     */
+
+const crearPedido = async (req, res) => {
+    
+    const usuarioLogueado = req.session.cliente;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+
+    const idCliente = usuarioLogueado.ID_Cliente;
+    const nombreCliente = usuarioLogueado.Nombre;
+    const carrito = await carritoModel.findAll({
+        where: {
+            ID_Cliente: idCliente,
+        }
+    });
+
+    try {
+
+        const ultimaInsercion = await pedidosModel.findAll({
+            order: [['Fecha', 'DESC']],
+            limit: 1,
+            attributes: ['No_pedido']
+        });
+
+        if (ultimaInsercion.length > 0) {
+            const ultimoNoPedido = ultimaInsercion[0].No_pedido;   
+
+        for (const producto of carrito) {
+            await pedidosModel.create({
+                No_pedido: ultimoNoPedido + 1,
+                ID_Cliente: idCliente,
+                Nombre_cliente: nombreCliente,
+                ID_Producto: producto.ID_Producto,
+                Nombre_producto: producto.Nombre_producto,
+                Descripcion: producto.Descripcion,
+                Cantidad_producto: producto.Cantidad_producto,
+                Precio_unitario_producto: producto.Precio_unitario_producto,
+                Precio_total_productos: producto.Precio_total_productos,
+                Cantidad_pagar: producto.Cantidad_pagar,
+                Ubicacion: producto.Ubicacion,
+                Fecha: new Date(),
+                Estatus: 'Pendiente de pago'
+            }, {
+                fields: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Cantidad_pagar', 'Ubicacion', 'Fecha', 'Estatus']
+            });
+        }
+    } else {
+        const primerNoPedido = 1;
+    for (const producto of carrito) {
+        await pedidosModel.create({
+            No_pedido: primerNoPedido,
+            ID_Cliente: idCliente,
+            Nombre_cliente: nombreCliente,
+            ID_Producto: producto.ID_Producto,
+            Nombre_producto: producto.Nombre_producto,
+            Descripcion: producto.Descripcion,
+            Cantidad_producto: producto.Cantidad_producto,
+            Precio_unitario_producto: producto.Precio_unitario_producto,
+            Precio_total_productos: producto.Precio_total_productos,
+            Cantidad_pagar: producto.Cantidad_pagar,
+            Ubicacion: producto.Ubicacion,
+            Fecha: new Date(),
+            Estatus: 'Pendiente de pago'
+        }, {
+            fields: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Cantidad_pagar', 'Ubicacion', 'Fecha', 'Estatus'] 
+        });
+    }
+    }
+
+        await carritoModel.destroy({
+            where: {
+                ID_Cliente: idCliente,
+            }
+        });
+
+        const consultar_Pedidos = await pedidosModel.findAll({ where: {
+            ID_Cliente: idCliente},
+            attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Cantidad_pagar', 'Ubicacion', 'Fecha', 'Estatus']
+        });
+
+        const cantidadPagarPorPedido = {};
+
+        consultar_Pedidos.forEach(pedido => {
+            if (!cantidadPagarPorPedido[pedido.No_pedido]) {
+                cantidadPagarPorPedido[pedido.No_pedido] = 0;
+            }
+            cantidadPagarPorPedido[pedido.No_pedido] += pedido.Precio_total_productos;
+        });
+
+        res.render('pedidoCliente', {
+            cantidadPagarPorPedido,
+            consultar_Pedidos,
+            titulo: "Mis pedidos",
+            enc: "Pedidos realizados"
+        });
+    } catch (error) {
+        console.error('Error al crear nuevo pedido:', error);
+        res.status(500).send('Error interno del servidor');
+    }  
+};
+
+const visualizarPedido = async (req, res) => {
+
+    const usuarioLogueado = req.session.cliente;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+    const idCliente = usuarioLogueado.ID_Cliente;
+    const consultar_Pedidos = await pedidosModel.findAll({ where: {
+        ID_Cliente: idCliente},
+        attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Cantidad_pagar', 'Ubicacion', 'Fecha', 'Estatus']
+    });
+
+    const cantidadPagarPorPedido = {};
+
+    consultar_Pedidos.forEach(pedido => {
+        if (!cantidadPagarPorPedido[pedido.No_pedido]) {
+            cantidadPagarPorPedido[pedido.No_pedido] = 0;
+        }
+        cantidadPagarPorPedido[pedido.No_pedido] += pedido.Precio_total_productos;
+    });
+
+    res.render('pedidoCliente', {
+        cantidadPagarPorPedido,
+        consultar_Pedidos,
+        titulo: "Mis pedidos",
+        enc: "Pedidos realizados"
+    });
+}
+
+/*                                           Inicio de controladores para los pedidos                                     */
+
 /*                                           CRUD Usuarios                                     */
 /*Ingreso al formulario para registro de usuarios*/
 const registroUsuarios = (req, res)=>{
@@ -279,7 +493,6 @@ const actualizarUsuario = async (req, res) => {
     const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Telefono, Correo, Rol, Nombre_usuario, Contrasena} = req.body
 
     try {
-        // Buscar el usuario existente
         const usuario = await usuarioModel.findByPk(userId);
 
         if (usuario) {
@@ -331,7 +544,7 @@ const eliminarUsuario = async (req, res) => {
     }
 };
 
-/*Controlador para consula de usuarios*/
+/*Controlador para consulta de usuarios*/
 const consultasUsuarios = async (req, res) => {
     const consultar_User = await usuarioModel.findAll();
     console.log(consultar_User);
@@ -723,5 +936,9 @@ module.exports = {
     Login,
     logOut,
     agregarAlCarrito,
-    visualizarCarrito
+    visualizarCarrito,
+    eliminarProductoCarrito,
+    enviarCarrito,
+    crearPedido,
+    visualizarPedido
 }
