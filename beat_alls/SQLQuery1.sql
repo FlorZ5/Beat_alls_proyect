@@ -113,3 +113,23 @@ Descripcion Varchar (300) not null,
 Fecha_hora date default current_timestamp not null,
 IP Varchar (15) not null
 );
+go
+create table Historial
+(
+Entrada int Primary Key not null,
+No_pedido int not null,
+ID_Cliente int not null,
+constraint fk_idclienteP foreign key (ID_Cliente) references Cliente(ID_Cliente),
+Nombre_cliente Varchar(15) not null,
+ID_Producto int not null,
+constraint fk_idproductoP foreign key (ID_Producto) references Productos(ID_Producto),
+Nombre_producto Varchar(30) not null,
+Descripcion Varchar(50) not null,
+Cantidad_producto smallint not null,
+Precio_unitario_producto smallint not null,
+Precio_total_productos int not null,
+Cantidad_pagar int not null,
+Fecha date not null default CURRENT_TIMESTAMP,
+Estatus Varchar(25),
+motivo_Cancelacion varchar(100) not null
+)

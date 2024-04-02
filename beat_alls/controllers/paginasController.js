@@ -7,8 +7,19 @@ const productosModel = require('../models/productosModel.js');
 const proveedorModel = require('../models/proveedorModel.js');
 const carritoModel = require('../models/carritoModel.js');
 const pedidosModel = require('../models/pedidosModel.js');
+const historialModel = require('../models/historialModel.js');
 
 
+
+const index = async (req, res) => {
+
+    try {
+        res.render('menuPrincipal')
+    } catch (error) {
+        console.error('Error al ingresar al sitio:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+}
 
 const productos = async (req, res) => {
         const consultar_Productos = await productosModel.findAll();
@@ -18,6 +29,47 @@ const productos = async (req, res) => {
             titulo: "Tienda",
             enc: "Productos"
         })
+}
+
+const panelNavegacion = async (req, res) => {
+    const clienteLogueado = req.session.cliente;
+    const usuarioLogueado = req.session.usuario;
+    const rol = req.session.userRole;
+
+    if (!usuarioLogueado && !clienteLogueado) {
+        return res.redirect('/login');
+    }
+
+    try {        
+        if (usuarioLogueado && rol == "Administrador") {
+                const nombre = usuarioLogueado.Nombre
+                res.render('panelAdministrador', {
+                    nombre
+                });
+            }
+
+            if (usuarioLogueado && rol == "Empleado") {
+                const nombre = usuarioLogueado.Nombre
+                res.render('panelEmpleado', {
+                    nombre
+                });
+            }
+
+            if (clienteLogueado && rol == "Cliente") {
+                const nombre = clienteLogueado.Nombre
+                res.render('panelCliente', {
+                    nombre
+                });
+            }     
+
+        res.render('login', {
+            titulo: "Login",
+            enc: "Inicio de sesión"
+        });
+    } catch (error) {
+        console.error('Error al consultar:', error);
+        res.status(500).send('Error interno del servidor');
+    }
 }
 /*Controladores generales*/
 /*Controlador para acceder al login*/
@@ -49,33 +101,27 @@ const inicioSesion = async (req, res) => {
 
         if (usuario) {
             const validarContraUsuario = await compare(Contrasena, usuario.Contrasena);
-            const header = './layout/headerAdministrador.ejs';
             if (validarContraUsuario) {
                 if(usuario.dataValues.Rol == "Administrador")
                 {
-                const consultar_Proveedor = await proveedorModel.findAll();
                 req.session.userRole = 'Administrador';
                 req.session.usuario = usuario;
-                res.render('proveedoresRegistrados', {
-                    header,
-                    consultar_Proveedor,
-                    titulo: "Registro de proveedores",
-                    enc: "Proveedores registrados",
+                const usuarioLogueado = req.session.usuario;
+                const nombre = usuarioLogueado.Nombre
+                res.render('panelAdministrador', {
+                    nombre
                 });
             }
 
                 if(usuario.dataValues.Rol == "Empleado")
                 {
-                    const header = './layout/header.ejs';
-                    const consultar_User = await usuarioModel.findAll();
                     req.session.userRole = 'Empleado';
                     req.session.usuario = usuario;
-                    res.render('usuariosRegistrados', {
-                    header,
-                    consultar_User,
-                    titulo: "Registro de usuarios",
-                    enc: "Usuarios registrados",
-                });
+                    const usuarioLogueado = req.session.usuario;
+                    const nombre = usuarioLogueado.Nombre
+                    res.render('panelEmpleado', {
+                        nombre
+                    });
                 }
             }
         }
@@ -83,18 +129,15 @@ const inicioSesion = async (req, res) => {
         if (cliente) {
             const validarContraCliente = await compare(Contrasena, cliente.Contrasena);
                 if (validarContraCliente) {
-                    const consultar_Productos = await productosModel.findAll();
-                    const header = './layout/header.ejs';
                     req.session.userRole = 'Cliente';
                     req.session.cliente = cliente;
-                            res.render('productos', {
-                                consultar_Productos,
-                                header,
-                                titulo: "Página principal",
-                                enc: "Productos",
+                    const usuarioLogueado = req.session.cliente;
+                    const nombre = usuarioLogueado.Nombre
+                            res.render('panelCliente', {
+                                nombre
                             });
                         }
-                    }
+                    }      
 
         res.render('login', {
             titulo: "Login",
@@ -413,9 +456,119 @@ const visualizarPedido = async (req, res) => {
         titulo: "Mis pedidos",
         enc: "Pedidos realizados"
     });
+};
+
+const cancelarPedido = async (req, res) =>  {
+
+    const usuarioLogueado = req.session.cliente;
+    const NumPedido = req.params.id
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+
+    try
+    {
+    const idCliente = usuarioLogueado.ID_Cliente;
+
+    
+    const pedidos = await pedidosModel.findAll({ where: {
+        ID_Cliente: idCliente,
+        No_pedido: NumPedido
+    },
+        attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Fecha', 'Estatus']
+    });
+
+    const cantidadPagarPorPedido = {};
+
+    pedidos.forEach(pedido => {
+        if (!cantidadPagarPorPedido[pedido.No_pedido]) {
+            cantidadPagarPorPedido[pedido.No_pedido] = 0;
+        }
+        cantidadPagarPorPedido[pedido.No_pedido] += pedido.Precio_total_productos;
+    });
+
+    for (const historial of pedidos) {
+        await historialModel.create({
+        No_pedido: historial.No_pedido,
+        ID_Cliente: usuarioLogueado.ID_Cliente,
+        Nombre_cliente: historial.Nombre_cliente,
+        ID_Producto: historial.ID_Producto,
+        Nombre_producto: historial.Nombre_producto,
+        Descripcion: historial.Descripcion,
+        Cantidad_producto: historial.Cantidad_producto,
+        Precio_unitario_producto: historial.Precio_unitario_producto,
+        Precio_total_productos: historial.Precio_total_productos,
+        Cantidad_pagar: cantidadPagarPorPedido,
+        Fecha: historial.Fecha,
+        Estatus: "Cancelado",
+        motivo_Cancelacion: "Cancelaste este pedido"
+    })
+    }
+
+    await pedidosModel.destroy({
+        where: {
+            No_pedido: NumPedido
+        }
+    })
+
+    const consultar_Pedidos = await pedidosModel.findAll({ where: {
+        ID_Cliente: idCliente},
+        attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Ubicacion', 'Fecha', 'Estatus']
+    });
+
+    res.render('pedidoCliente', {
+        cantidadPagarPorPedido,
+        consultar_Pedidos,
+        titulo: "Mis pedidos",
+        enc: "Mis pedidos"
+    })
+    } catch (error) {
+        console.error('Error al eliminar el pedido:', error);
+        res.status(500).send('Error interno del servidor');
+    } 
 }
 
-/*                                           Inicio de controladores para los pedidos                                     */
+/*                                           Fin de controladores para los pedidos                                     */
+
+/*                                           Inicio de controladores para el historial                                     */
+
+const pedidosFinalizados = async (req, res) => {
+
+    const usuarioLogueado = req.session.cliente;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+
+    try {
+    const idCliente = usuarioLogueado.ID_Cliente;
+
+
+    const consultar_Historial = await historialModel.findAll({ where: {
+        ID_Cliente: idCliente
+    },
+    });
+
+    const cantidadPagarPorPedido = {};
+
+    consultar_Historial.forEach(pedido => {
+        if (!cantidadPagarPorPedido[pedido.No_pedido]) {
+            cantidadPagarPorPedido[pedido.No_pedido] = 0;
+        }
+        cantidadPagarPorPedido[pedido.No_pedido] += pedido.Precio_total_productos;
+    });
+
+    res.render('pedidosFinalizados', {
+        cantidadPagarPorPedido,
+        consultar_Historial,
+        titulo: "Historial",
+        enc: "Historial de pedidos"
+    });
+} catch (error) {
+    console.error('Error al eliminar el pedido:', error);
+    res.status(500).send('Error interno del servidor');
+}
+}
 
 /*                                           CRUD Usuarios                                     */
 /*Ingreso al formulario para registro de usuarios*/
@@ -907,7 +1060,9 @@ const eliminarProveedor = async (req, res) => {
 /*                                           Fin CRUD Proveedores                                     */
 
 module.exports = {
+    index,
     productos,
+    panelNavegacion,
     inicioSesion,
     altasUsuario, 
     registroUsuarios,
@@ -940,5 +1095,7 @@ module.exports = {
     eliminarProductoCarrito,
     enviarCarrito,
     crearPedido,
-    visualizarPedido
+    visualizarPedido,
+    cancelarPedido,
+    pedidosFinalizados
 }

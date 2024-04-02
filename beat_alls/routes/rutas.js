@@ -5,8 +5,14 @@ const authorizationMiddleware = require('../middlewares/authorizationMiddleware.
 const cargas = require('../controllers/upload.js')
 
 
-/*Rutas naturaleAs*/
+/*Rutas naturales*/
+
+router.get("/", paginas.index);
+
 router.get("/productos", paginas.productos);
+
+router.get("/panelNavegacion", paginas.panelNavegacion);
+
 /* Login */
 router.get("/login", paginas.Login); // Obtener el formulario de Login.
 
@@ -32,7 +38,15 @@ router.get('/crearPedido', paginas.crearPedido);
 
 router.get('/visualizarPedido', paginas.visualizarPedido);
 
+router.get('/cancelarPedido/:id', paginas.cancelarPedido);
+
 /*Aquí finalizan los pedidos*/
+
+/*Aquí inicia el historial*/
+
+router.get('/pedidosFinalizados', paginas.pedidosFinalizados);
+
+/*Aquí finaliza el historial*/
 
 /* Aquí inician las rutas del CRUD usuarios */
 router.get("/usuariosRegistrados", authorizationMiddleware, paginas.consultasUsuarios);

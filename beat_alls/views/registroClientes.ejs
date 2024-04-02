@@ -1,44 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
+	<meta charset="UTF-8">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/stilo.css">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Responsive Bootstrap4 Shop Template, https://imransdesign.com/">
+	<link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
+    <link rel="stylesheet" href="/assets/css/formulario.css">
+	<title>Registro</title>
 </head>
+<header>
+    <%- include('./layout/nav.ejs'); %>
+</header>
+
+<header>
+    <%- include('./layout/diseño.ejs'); %>
+</header>
+
+<header>
+    <%- include('./layout/diseñoregistro.ejs'); %>
+</header>
+
 <body>
-    <%- include('./layout/header.ejs'); -%>
+<div class="contact_form">
+    <div class="formulario">		
+        <h3 style="color: rgb(131, 163, 251); font-family: Rockwell;">¡Hola! Bienvenid@, registrate</h3>
     <form action="/registroClientes" method="post">
-        <label for="Nombre">Nombre</label>
+        <label for="Nombre" style="color: aliceblue;">Nombre</label>
         <input name="Nombre" id="Nombre" type="text">
         <br>
-        <label for="Apellido">Apellido</label>
+        <label for="Apellido" style="color: aliceblue;">Apellido</label>
         <input name="Apellido" id="Apellido" type="text">
         <br>
-        <label for="Direccion">Dirección</label>
+        <label for="Direccion" style="color: aliceblue;">Dirección</label>
         <input name="Direccion" id="Direccion" type="text">
         <br>
-        <label for="Edad">Edad</label>
+        <label for="Edad" style="color: aliceblue;">Edad</label>
         <input name="Edad" id="Edad" type="text">
         <br>
-        <label for="Fecha_nacimiento">Fecha de nacimiento</label>
+        <label for="Fecha_nacimiento" style="color: aliceblue;">Fecha de nacimiento</label>
         <input name="Fecha_nacimiento" id="Fecha_nacimiento" type="date">
         <br>
-        <label for="Telefono">Telefono</label>
+        <label for="Telefono" style="color: aliceblue;">Telefono</label>
         <input name="Telefono" id="Telefono" type="text">
         <br>
-        <label for="Correo">Correo electrónico</label>
+        <label for="Correo" style="color: aliceblue;">Correo electrónico</label>
         <input name="Correo" id="Correo" type="email">
         <br>
-        <label for="Nombre_usuario">Usuario</label>
+        <label for="Nombre_usuario" style="color: aliceblue;">Usuario</label>
         <input name="Nombre_usuario" id="Nombre_usuario" type="text">
         <br>
-        <label for="Contrasena">Contraseña</label>
+        <label for="Contrasena" style="color: aliceblue;">Contraseña</label>
         <input name="Contrasena" id="Contrasena" type="password">
-        <br>
-        <button type="submit">Registrarse</button>
+        <br><br>
+        <button type="submit" style="color: aliceblue;">Registrarse</button>
     </form> 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    </div>
+</div>
+    <footer>
+        <%- include('./layout/footer.ejs'); %>
+      </footer>
 </body>
+
 </html>

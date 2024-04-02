@@ -1,55 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
+	<meta charset="UTF-8">
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="/css/stilo.css">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Responsive Bootstrap4 Shop Template, https://imransdesign.com/">
+	<link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
+    <link rel="stylesheet" href="/assets/css/formulario.css">
     <title><%= titulo %></title> 
 </head>
+<header>
+    <%- include('./layout/nav.ejs'); %>
+</header>
+
+<header>
+    <%- include('./layout/diseño.ejs'); %>
+</header>
+
+<header>
+    <%- include('./layout/diseñoregistro.ejs'); %>
+</header>
 <body>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <%- include('./layout/header.ejs'); -%>
-    <br>
-    <center><h1><%= enc %></h1></center>
-    <br>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Cantidad</th>
-                <th>Precio unitario</th>
-                <th>Acumulado</th>
-                <td>Total a pagar</td>
-                <td>Metodo de pago</td>
-            </tr>
-        </thead>
-        <tbody>
-            <% consultar_Carrito.forEach(carrito => { %>
-                <tr>
-                    <td><%= carrito.Nombre_producto %></td>
-                    <td><%= carrito.Descripcion %></td>
-                    <td><%= carrito.Cantidad_producto %></td>
-                    <td><%= carrito.Precio_unitario_producto %></td>
-                    <td><%= carrito.Precio_total_productos %></td>
-            <% }); %>
-                    <td><%= totalPagar %></td>
-                    <td>
-                        <select name="tipoPago" id="tipoPago">
-                        <option value="">Efectivo</option>
-                        <option value="">Transferecia</option>
-                    </select>
-                    </td>
-                </tr>
-            <tr>
-                <td><a href="/crearPedido">Finalizar pedido</a></td>
-            </tr>
-        </tbody>
-    </table>
-    <br>
-    <%- include('./layout/footer.ejs'); -%>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <div class="cart-section mt-50 mb-50">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 col-md-12">
+					<div class="cart-table-wrap">
+                        <table class="cart-table">
+                            <thead class="cart-table-head">
+                                <tr class="table-head-row">
+                                    <th class="product-name">Nombre</th>
+                                    <th class="product-name">Descripción</th>
+                                    <th class="product-price">Cantidad</th>
+                                    <th class="product-quantity">Precio unitario</th>
+                                    <th class="product-total">Acumulado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% consultar_Carrito.forEach(carrito => { %>
+                                    <tr class="table-body-row">
+                                        <td><%= carrito.Nombre_producto %></td>
+                                        <td><%= carrito.Descripcion %></td>
+                                        <td><%= carrito.Cantidad_producto %></td>
+                                        <td><%= carrito.Precio_unitario_producto %></td>
+                                        <td><%= carrito.Precio_total_productos %></td>
+                                    </tr>
+                                <% }); %>
+                                <tr class="table-body-row">
+                                    <th class="product-name" style="text-align: center;">Total a pagar</th>
+                                </tr>
+                                <tr class="table-body-row">
+                                    <td><%= totalPagar %></td>
+                                </tr>
+                                <tr class="table-body-row">
+                                    <td class="product-total"><button type="button" style="border-radius: 15px;"><a href="/crearPedido" style="text-decoration: none; color: black;">Finalizar pedido</a></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
+<footer>
+    <%- include('./layout/footer.ejs'); -%>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </html>

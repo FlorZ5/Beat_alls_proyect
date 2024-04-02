@@ -1,0 +1,11 @@
+.after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    content: "";
+    background-image: linear-gradient(to top, #bd31ee 19%, #fb3fe4 100%, #ff1d19 50%, #f9fc36 50%);
+    z-index: -1;
+    opacity: 0.8;
+  }
