@@ -533,17 +533,19 @@ const cancelarPedido = async (req, res) =>  {
 /*                                           Inicio de controladores para el historial                                     */
 
 const pedidosFinalizados = async (req, res) => {
-
+    const userLogueado = req.session.usuario;
     const usuarioLogueado = req.session.cliente;
+    const rol = req.session.userRole;
 
-    if (!usuarioLogueado) {
+    if (!usuarioLogueado && !userLogueado) {
         return res.redirect('/login');
     }
 
     try {
+
+    if(usuarioLogueado)
+    {
     const idCliente = usuarioLogueado.ID_Cliente;
-
-
     const consultar_Historial = await historialModel.findAll({ where: {
         ID_Cliente: idCliente
     },
@@ -564,8 +566,30 @@ const pedidosFinalizados = async (req, res) => {
         titulo: "Historial",
         enc: "Historial de pedidos"
     });
+    }
+
+
+    if(userLogueado && (rol == "Empleado" || rol == "Administrador"))
+    {
+        const consultar_Historial = await historialModel.findAll();
+        const cantidadPagarPorPedido = {};
+
+        consultar_Historial.forEach(pedido => {
+        if (!cantidadPagarPorPedido[pedido.No_pedido]) {
+            cantidadPagarPorPedido[pedido.No_pedido] = 0;
+        }
+        cantidadPagarPorPedido[pedido.No_pedido] += pedido.Precio_total_productos;
+    });
+
+    res.render('pedidosFinalizados', {
+        cantidadPagarPorPedido,
+        consultar_Historial,
+        titulo: "Historial",
+        enc: "Historial de pedidos"
+    });
+    }
 } catch (error) {
-    console.error('Error al eliminar el pedido:', error);
+    console.error('Error al consultar el historial:', error);
     res.status(500).send('Error interno del servidor');
 }
 }
@@ -989,7 +1013,7 @@ const consultasProveedores = async (req, res) => {
     console.log(consultar_Proveedor);
     res.render('proveedoresRegistrados',
     {consultar_Proveedor,
-    titulo:'proveedores registrados', 
+    titulo:'Proveedores registrados', 
     enc:'Proveedores registrados'});
 }
 

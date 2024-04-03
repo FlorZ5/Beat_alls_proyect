@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="Responsive Bootstrap4 Shop Template, https://imransdesign.com/">
 	<link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
     <link rel="stylesheet" href="/assets/css/formulario.css">
     <title><%= titulo %></title> 
@@ -18,82 +17,73 @@
 </header>
 
 <header>
-    <%- include('./layout/diseñocarrito.ejs'); %>
+    <%- include('./layout/diseñoHistorial.ejs'); %>
 </header>
 <body>
-    <table>
-        <thead>
-            <tr>
-                <th>Número de pedido</th>
-                <th>Nombre del producto</th>
-                <th>Descripción</th>
-                <th>Cantidad</th>
-                <th>Precio unitario</th>
-                <th>Acumulado</th>
-                <th>Fecha</th>
-                <th>Estado del pedido</th>
-                <th>Total</th>
-                <th>Motivo de cancelación</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% const numerosPedidosUnicos = new Set(consultar_Historial.map(pedido => pedido.No_pedido)); %>
-            <% numerosPedidosUnicos.forEach(numeroPedido => { %>
-                <% const pedidosMismoNumero = consultar_Historial.filter(pedido => pedido.No_pedido === numeroPedido); %>
-                <tr>
-                    <% if (pedidosMismoNumero.length > 0) { %>
-                        <td rowspan="<%= pedidosMismoNumero.length %>"><%= numeroPedido %></td>
-                        <% pedidosMismoNumero.forEach((pedido, index) => { %>
-                            <% if (index !== 0) { %>
-                                <tr>
-                            <% } %>
-                            <td><%= pedido.Nombre_producto %></td>
-                            <td><%= pedido.Descripcion %></td>
-                            <td><%= pedido.Cantidad_producto %></td>
-                            <td><%= pedido.Precio_unitario_producto %></td>
-                            <td><%= pedido.Precio_total_productos %></td>
-                            <td><%= pedido.Fecha %></td>
-                            <td><%= pedido.Estatus %></td>
+<div class="cart-section mt-50 mb-50">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-12">
+                <div class="cart-table-wrap">
+                    <table class="cart-table">
+                        <thead class="cart-table-head">
+                            <tr class="table-head-row">
+                                <th>Número de pedido</th>
+                                <th>Nombre del producto</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio unitario</th>
+                                <th>Acumulado</th>
+                                <th>Fecha</th>
+                                <th>Estado del pedido</th>
+                                <th>Total</th>
+                                <th>Motivo de cancelación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% const numerosPedidosUnicos = new Set(consultar_Historial.map(pedido => pedido.No_pedido)); %>
+                            <% numerosPedidosUnicos.forEach(numeroPedido => { %>
+                                <% const pedidosMismoNumero = consultar_Historial.filter(pedido => pedido.No_pedido === numeroPedido); %>
+                                <tr class="table-head-row">
+                                    <% if (pedidosMismoNumero.length > 0) { %>
+                                        <td rowspan="<%= pedidosMismoNumero.length %>"><%= numeroPedido %></td>
+                                        <% pedidosMismoNumero.forEach((pedido, index) => { %>
+                                            <% if (index !== 0) { %>
+                                                <tr class="table-head-row">
+                                            <% } %>
+                                            <td><%= pedido.Nombre_producto %></td>
+                                            <td><%= pedido.Descripcion %></td>
+                                            <td><%= pedido.Cantidad_producto %></td>
+                                            <td><%= pedido.Precio_unitario_producto %></td>
+                                            <td><%= pedido.Precio_total_productos %></td>
+                                            <td><%= pedido.Fecha %></td>
+                                            <td><%= pedido.Estatus %></td>
 
-                            <% if (index === 0) { %>
-                                <td rowspan="<%= pedidosMismoNumero.length %>">
-                                    <%= cantidadPagarPorPedido[numeroPedido] %><br>
-                                </td>
-                                <td rowspan="<%= pedidosMismoNumero.length %>">
-                                    <%= pedido.motivo_Cancelacion %>
-                                </td>
-                            <% } %>
-                            <% if (index !== 0) { %>
+                                            <% if (index === 0) { %>
+                                                <td rowspan="<%= pedidosMismoNumero.length %>">
+                                                    <%= cantidadPagarPorPedido[numeroPedido] %><br>
+                                                </td>
+                                                <td rowspan="<%= pedidosMismoNumero.length %>">
+                                                    <%= pedido.motivo_Cancelacion %>
+                                                </td>
+                                            <% } %>
+                                            <% if (index !== 0) { %>
+                                                </tr>
+                                            <% } %>
+                                        <% }); %>
+                                    <% } %>
                                 </tr>
-                            <% } %>
-                        <% }); %>
-                    <% } %>
-                </tr>
-            <% }); %>
-        </tbody>     
-    </table>
-    <br>
-    <%- include('./layout/footer.ejs'); -%>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+                            <% }); %>
+                        </tbody>     
+                    </table>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
-<style>
-    table {
-        border-collapse: collapse;
-        width: 100%;
-    }
-
-    th, td {
-        padding: 8px;
-        text-align: left;
-        border-bottom: 5px solid #000;
-    }
-
-    th {
-        background-color: #f2f2f2;
-    }
-
-    tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
-</style>
+<footer>
+    <%- include('./layout/footer.ejs'); -%>
+</footer>
 </html>
