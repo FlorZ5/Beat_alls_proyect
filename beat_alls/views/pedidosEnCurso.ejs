@@ -30,6 +30,7 @@
                         <thead class="cart-table-head">
                             <tr class="table-head-row">
                                 <th class="product-name">Número de pedido</th>
+                                <th class="product-name">ID del Cliente</th>
                                 <th class="product-name">Nombre del producto</th>
                                 <th class="product-name">Descripción</th>
                                 <th class="product-price">Cantidad</th>
@@ -51,6 +52,7 @@
                                             <% if (index !== 0) { %>
                                                 <tr>
                                             <% } %>
+                                            <td class="product-name"><%= pedido.ID_Cliente %></td>
                                             <td class="product-name"><%= pedido.Nombre_producto %></td>
                                             <td class="product-name"><%= pedido.Descripcion %></td>
                                             <td class="product-name"><%= pedido.Cantidad_producto %></td>
@@ -62,8 +64,8 @@
                                             <% if (index === 0) { %>
                                                 <td rowspan="<%= pedidosMismoNumero.length %>">
                                                     Cantidad a pagar: <%= cantidadPagarPorPedido[numeroPedido] %><br>
-                                                    <button type="button" style="border-radius: 15px;"><a href="/cancelarPedido/<%= numeroPedido %>" style="text-decoration: none; color: black;">Cancelar pedido</a></button><br><br>
-                                                    <button type="button" style="border-radius: 15px;"><a href="/pagar" style="text-decoration: none; color: black;">Pagar</a></button>
+                                                    <a href="/actualizacionPedido?id=<%= numeroPedido %>&ubicacion=<%= pedido.Ubicacion %>&Estatus=<%= pedido.Estatus %>">Actualizar</a><br><br>
+                                                    <a href="/pagar">Cancelar</a>
                                                 </td>
                                             <% } %>
                                             <% if (index !== 0) { %>

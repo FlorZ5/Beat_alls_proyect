@@ -1,0 +1,69 @@
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+    <meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
+    <link rel="stylesheet" href="/assets/css/formulario.css">
+    <title>Actualizar usuario</title>
+</head>
+<header>
+    <%- include('./layout/nav.ejs'); %>
+</header>
+
+<header>
+    <%- include('./layout/diseño.ejs'); %>
+</header>
+
+<header>
+    <%- include('./layout/diseñoActualizacion.ejs'); %>
+</header>
+<body>
+<div class="contact_form">
+    <div class="formulario">
+    <div class="container">
+        <form action="/actualizacionPedido/<%- No_pedido %>" method="post">
+            <div class="mb-3">
+                <label for="Nombre" class="form-label">Número de pedido:</label>
+                <input name="noPedido" id="noPedido" class="form-control" type="text" value="<%- No_pedido %>" disabled>
+            </div>
+
+            <div class="mb-3">
+                <label for="Ubicacion" class="form-label">Ubicación:</label>
+                <select name="ubicacion" id="ubicacion">
+                    <option value="Ciudad de Mexico" id="Ciudad de Mexico">Ciudad de México</option>
+                    <option value="Estado de México" id="Estado de México">Estado de México</option>
+                    <option value="Nuevo Leon" id="Nuevo Leon">Nuevo León</option>
+                    <option value="Jalisco" id="Jalisco">Jalisco</option>
+                    <option value="Guanajuato" id="Guanajuato">Guanajauto</option>
+                    <option value="Veracruz" id="Veracruz">Veracruz</option>
+                    <option value="Coahuila" id="Coahuila">Coahuila</option>
+                    <option value="Baja California" id="Baja California">Baja California</option>
+                    <option value="Aguascalientes" id="Aguascalientes">Aguascalientes</option>
+                </select>
+                <span class="form-text">Ubicación actual: <%- Ubicacion %></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="Estatus" class="form-label">Estatus:</label>
+                <select name="estatus" id="estatus">
+                    <option value="Procesando pedido" id="Procesando pedido">Procesando pedido</option>
+                    <option value="Enviado">Enviado</option>
+                    <option value="En ruta de entrega">En ruta de entrega</option>
+                    <option value="Entregado" id="Entregado">Entregado</option>
+                </select>
+                <span class="form-text">Situación actual: <%- Estatus %></span>
+            </div>
+
+            <input type="hidden" name="_method" value="put">
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+        </form>
+    </div>
+    </div>
+</div>
+</body>
+<footer>
+    <%- include('./layout/footer.ejs'); %>
+</footer>
+</html>

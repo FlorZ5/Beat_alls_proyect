@@ -40,11 +40,18 @@ router.get('/visualizarPedido', authorizationMiddleware, paginas.visualizarPedid
 
 router.get('/cancelarPedido/:id', authorizationMiddleware, paginas.cancelarPedido);
 
+router.get('/PedidosEnCurso', authorizationMiddleware, paginas.pedidosEnCurso);
+
+router.get('/actualizacionPedido', paginas.actualizacionPedido);
+
+router.post('/actualizacionPedido/:id', paginas.actualizarPedido);
+
 /*Aquí finalizan los pedidos*/
 
 /*Aquí inicia el historial*/
 
 router.get('/pedidosFinalizados', authorizationMiddleware, paginas.pedidosFinalizados);
+
 
 /*Aquí finaliza el historial*/
 

@@ -428,6 +428,34 @@ const crearPedido = async (req, res) => {
     }  
 };
 
+const pedidosEnCurso = async (req, res) => {
+
+    const usuarioLogueado = req.session.usuario;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+    const consultar_Pedidos = await pedidosModel.findAll({
+        attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Cantidad_pagar', 'Ubicacion', 'Fecha', 'Estatus']
+    });
+
+    const cantidadPagarPorPedido = {};
+
+    consultar_Pedidos.forEach(pedido => {
+        if (!cantidadPagarPorPedido[pedido.No_pedido]) {
+            cantidadPagarPorPedido[pedido.No_pedido] = 0;
+        }
+        cantidadPagarPorPedido[pedido.No_pedido] += pedido.Precio_total_productos;
+    });
+
+    res.render('pedidosEnCurso', {
+        cantidadPagarPorPedido,
+        consultar_Pedidos,
+        titulo: "Pedidos",
+        enc: "Pedidos realizados"
+    });
+}
+
 const visualizarPedido = async (req, res) => {
 
     const usuarioLogueado = req.session.cliente;
@@ -456,6 +484,58 @@ const visualizarPedido = async (req, res) => {
         titulo: "Mis pedidos",
         enc: "Pedidos realizados"
     });
+};
+
+const actualizacionPedido = (req, res) => {
+    
+    const No_pedido = req.query.id;
+    const Ubicacion = req.query.ubicacion;
+    const Estatus = req.query.Estatus;
+
+    res.render('actualizacionPedidos',{
+        titulo: 'Actualizar pedido',
+        No_pedido,
+        Ubicacion,
+        Estatus
+    })
+};
+
+const actualizarPedido = async (req, res) => {
+
+    const {ubicacion, estatus} = req.body;
+    const noPedido = req.params.id;
+    console.log("No pedido: ", noPedido, "Ubicacion: ", ubicacion, "Estatus: ", estatus)
+
+    try {
+            await pedidosModel.update({
+                Ubicacion: ubicacion,
+                Estatus: estatus
+            }, {where: {
+                No_pedido: noPedido
+            }});
+
+            const consultar_Pedidos = await pedidosModel.findAll({
+                attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Ubicacion', 'Fecha', 'Estatus']
+            });
+
+            const cantidadPagarPorPedido = {};
+
+            consultar_Pedidos.forEach(pedido => {
+                if (!cantidadPagarPorPedido[pedido.No_pedido]) {
+                    cantidadPagarPorPedido[pedido.No_pedido] = 0;
+                }
+                cantidadPagarPorPedido[pedido.No_pedido] += pedido.Precio_total_productos;
+            });
+
+            res.render('pedidosEnCurso', {
+                consultar_Pedidos,
+                cantidadPagarPorPedido,
+                titulo: "Pedidos"
+            });
+    } catch (error) {
+        console.error('Error al actualizar el pedido:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 };
 
 const cancelarPedido = async (req, res) =>  {
@@ -1119,7 +1199,10 @@ module.exports = {
     eliminarProductoCarrito,
     enviarCarrito,
     crearPedido,
+    pedidosEnCurso,
     visualizarPedido,
+    actualizacionPedido,
+    actualizarPedido,
     cancelarPedido,
     pedidosFinalizados
 }
