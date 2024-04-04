@@ -747,7 +747,7 @@ const altasUsuario = async (req, res) => {
 /*Controlador para actualización de usuarios*/
 const actualizarUsuario = async (req, res) => {
     const userId = req.params.id;
-    const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Telefono, Correo, Rol, Nombre_usuario, Contrasena} = req.body
+    const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Telefono, Correo, Rol, Nombre_usuario, Contrasena} = req.body;
 
     try {
         const usuario = await usuarioModel.findByPk(userId);

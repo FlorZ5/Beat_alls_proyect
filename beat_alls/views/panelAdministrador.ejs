@@ -3,9 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
+    <title>Panel</title>
+    <style>
+        body {
+            background: rgb(58, 120, 180);
+            background: linear-gradient(90deg, rgba(58, 120, 180, 1) 13%, rgba(59, 29, 253, 1) 77%, rgba(213, 69, 252, 1) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .button-container-wrapper {
+            background-color: #588898;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        .button-container ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .button-container li {
+            margin-bottom: 10px;
+        }
+
+        .button-container button {
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .button-container button:hover {
+            background-color: white;
+            color: black;
+        }
+    </style>
 </head>
 <body>
+    <ul>
+        <img src="/assets/images/LOGO5.png" alt="Logo" height="300" width="300">
+    </ul>
+    <ul>
+        <h1>Bienvenid@, <%- nombre %></h1>
+    </ul>
+    
+<div class="button-container-wrapper">
+    <div class="button-container">
     <button style="border-radius: 15px;"><a href="/registroProveedores" style="text-decoration: none; color: black;">Registar nuevo proveedor</a></button>
     <button style="border-radius: 15px;"><a href="/proveedoresRegistrados" style="text-decoration: none; color: black;">Proveedores registrados</a></button>
     <button style="border-radius: 15px;"><a href="/productos" style="text-decoration: none; color: black;">Productos</a></button>
@@ -14,10 +73,12 @@
     <button style="border-radius: 15px;"><a href="/registroUsuarios" style="text-decoration: none; color: black;">Registrar empleado</a></button>
     <button style="border-radius: 15px;"><a href="/usuariosRegistrados" style="text-decoration: none; color: black;">Empleados registrados</a></button>
     <button style="border-radius: 15px;"><a href="/clientesRegistrados" style="text-decoration: none; color: black;">Clientes registrados</a></button>
-    <button style="border-radius: 15px;"><a href="/historialAdmin" style="text-decoration: none; color: black;">Historial de pedidos</a></button>
-    <button style="border-radius: 15px;"><a href="/pedidosAdmin" style="text-decoration: none; color: black;">Pedidos en curso</a></button>
+    <button style="border-radius: 15px;"><a href="/PedidosFinalizados" style="text-decoration: none; color: black;">Historial de pedidos</a></button>
+    <button style="border-radius: 15px;"><a href="/pedidosEnCurso" style="text-decoration: none; color: black;">Pedidos en curso</a></button>
     <button style="border-radius: 15px;"><a href="/logsEmpleados" style="text-decoration: none; color: black;">Logs empleados</a></button>
     <button style="border-radius: 15px;"><a href="/logsClientes" style="text-decoration: none; color: black;">Logs clientes</a></button>
     <button style="border-radius: 15px;"><a href="/logout" style="text-decoration: none; color: black;">Salir</a></button>
+    </div>
+</div>    
 </body>
 </html>
