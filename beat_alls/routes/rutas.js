@@ -38,7 +38,7 @@ router.get('/crearPedido', authorizationMiddleware, paginas.crearPedido);
 
 router.get('/visualizarPedido', authorizationMiddleware, paginas.visualizarPedido);
 
-router.get('/cancelarPedido/:id', authorizationMiddleware, paginas.cancelarPedido);
+router.get('/cancelarPedido/:id', paginas.cancelarPedido);
 
 router.get('/PedidosEnCurso', authorizationMiddleware, paginas.pedidosEnCurso);
 
@@ -70,9 +70,9 @@ router.get("/usuariosRegistrados/:id", paginas.eliminarUsuario);
 /* Aquí terminan las rutas del CRUD usuarios */
 
 /* Aquí inician las rutas del CRUD clientes */
-router.get("/registroClientes", authorizationMiddleware, paginas.registroClientes);
+router.get("/registroClientes", paginas.registroClientes);
 
-router.post("/registroClientes", authorizationMiddleware, paginas.altasClientes);
+router.post("/registroClientes", paginas.altasClientes);
 
 router.get("/clientesRegistrados", authorizationMiddleware, paginas.consultasClientes);
 
@@ -110,5 +110,11 @@ router.post("/proveedoresRegistrados/:id", paginas.actualizarProveedor);
 
 router.get("/proveedoresRegistrados/:id", paginas.eliminarProveedor);
 /* Aquí terminan las rutas del CRUD proveedores */
+
+/*Logs*/
+
+router.get('/logsClientes', authorizationMiddleware, paginas.logsClientes);
+
+router.get('/logsUsuarios', authorizationMiddleware, paginas.logsUsuarios);
 
 module.exports = router;

@@ -1,0 +1,66 @@
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+    <meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" type="image/png" href="/assets/images/LOGO5.png">
+    <link rel="stylesheet" href="/assets/css/formulario.css">
+    <title><%= titulo %></title> 
+</head>
+<header>
+    <%- include('./layout/nav.ejs'); %>
+</header>
+
+<header>
+    <%- include('./layout/diseño.ejs'); %>
+</header>
+
+<header>
+    <%- include('./layout/diseñoUsuariosRegistrados.ejs'); %>
+</header>
+<body>
+<div class="cart-section mt-50 mb-50">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 col-md-12">
+				<div class="cart-table-wrap">
+                    <table class="cart-table">
+                        <thead class="cart-table-head">
+                            <tr class="table-head-row">
+                                <th>ID</th>
+                                <th>ID de cliente</th>
+                                <th>Rol</th>
+                                <th>Nombre</th>
+                                <th>Acción</th>
+                                <th>Descripción</th>
+                                <th>Fecha y hora</th>
+                                <th>IP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% consultar_Logs.forEach(logs => { %>
+                                <tr class="table-head-row">
+                                    <td><%= logs.ID %></td>
+                                    <td><%= logs.ID_Cliente %></td>
+                                    <td><%= logs.Rol %></td>
+                                    <td><%= logs.Nombre_cliente %></td>
+                                    <td><%= logs.Accion %></td>
+                                    <td><%= logs.Descripcion %></td>
+                                    <td><%= logs.Fecha_hora %></td>
+                                    <td><%= logs.IP %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<footer>
+    <%- include('./layout/footer.ejs'); -%>
+</footer>
+</html>

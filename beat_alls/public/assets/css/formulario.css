@@ -8,6 +8,18 @@ body{
   background-color: #2f70d2; 
 }
 
+/* .container {
+	display: flex;
+	align-items: center;
+	height: 300px;
+	border: 1px solid #ccc;
+}
+
+.element {
+	padding: 10px;
+	margin: 5px;
+	background-color: lightblue;
+} */
 
 .contact_form{	
 	width: 460px; 
