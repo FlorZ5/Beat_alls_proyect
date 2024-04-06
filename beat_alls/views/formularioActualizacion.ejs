@@ -55,18 +55,6 @@
             </div>
 
             <div class="mb-3">
-                <label for="Telefono" class="form-label">Telefono:</label>
-                <input name="Telefono" id="Telefono" class="form-control" type="text" value="<%- Telefono %>">
-                <span class="form-text">Telefono actual: <%- Telefono %></span>
-            </div>
-
-            <div class="mb-3">
-                <label for="Correo" class="form-label">Correo electrónico:</label>
-                <input name="Correo" id="Correo" class="form-control" type="email" value="<%- Correo %>">
-                <span class="form-text">Correo actual: <%- Correo %></span>
-            </div>
-
-            <div class="mb-3">
                 <label for="Rol" class="form-label">Rol:</label>
                 <select name="Rol" id="Rol" class="form-control">
                     <option value="Administrador" id="Administrador">Administrador</option>
@@ -75,16 +63,6 @@
                 <span class="form-text">Rol actual: <%- Rol %></span>
             </div>
 
-            <div class="mb-3">
-                <label for="Nombre_usuario" class="form-label">Nombre de usuario:</label>
-                <input name="Nombre_usuario" id="Nombre_usuario" class="form-control" type="text" value="<%- Nombre_usuario %>">
-                <span class="form-text">Nombre de usuario actual: <%- Nombre_usuario %></span>
-            </div>
-
-            <div class="mb-3">
-                <label for="Contrasena" class="form-label">Contraseña:</label>
-                <input name="Contrasena" id="Contrasena" class="form-control" type="password">
-            </div>
             <input type="hidden" name="_method" value="put">
             <button type="submit" class="btn btn-primary">Actualizar</button>
         </form>

@@ -395,6 +395,13 @@ const enviarCarrito = async (req, res) => {
     const consultar_Carrito = await carritoModel.findAll({ where: {
         ID_Cliente: idCliente 
     }});
+
+
+    
+    if (!consultar_Carrito)
+    {
+        res.render('visualizarCarrito')
+    }
     const totalPagar = consultar_Carrito.reduce((total, carrito) => total + carrito.Precio_total_productos, 0);
 
     res.render('crearPedido', {
@@ -410,7 +417,6 @@ const enviarCarrito = async (req, res) => {
 /*                                           Inicio de controladores para los pedidos                                     */
 
 const crearPedido = async (req, res) => {
-    
     const usuarioLogueado = req.session.cliente;
 
     if (!usuarioLogueado) {
@@ -426,7 +432,9 @@ const crearPedido = async (req, res) => {
     });
 
     try {
-        const ultimaInsercion = await pedidosModel.findAll({
+        let ultimoNoPedido;
+        
+        const ultimaInsercionPedidos = await pedidosModel.findAll({
             order: [['Fecha', 'DESC']],
             limit: 1,
             attributes: ['No_pedido']
@@ -438,12 +446,21 @@ const crearPedido = async (req, res) => {
             attributes: ['No_pedido']
         });
 
-        if (ultimaInsercion.length > 0) {
-            const ultimoNoPedido = ultimaInsercion[0].No_pedido;   
+        if (ultimaInsercionPedidos.length > 0 && ultimaInsercionHistorial.length > 0) {
+            const ultimoNoPedidoPedidos = ultimaInsercionPedidos[0].No_pedido;
+            const ultimoNoPedidoHistorial = ultimaInsercionHistorial[0].No_pedido;
+            ultimoNoPedido = Math.max(ultimoNoPedidoPedidos, ultimoNoPedidoHistorial) + 1;
+        } else if (ultimaInsercionPedidos.length > 0) {
+            ultimoNoPedido = ultimaInsercionPedidos[0].No_pedido + 1;
+        } else if (ultimaInsercionHistorial.length > 0) {
+            ultimoNoPedido = ultimaInsercionHistorial[0].No_pedido + 1;
+        } else {
+            ultimoNoPedido = 1;
+        }  
 
         for (const producto of carrito) {
             await pedidosModel.create({
-                No_pedido: ultimoNoPedido + 1,
+                No_pedido: ultimoNoPedido,
                 ID_Cliente: idCliente,
                 Nombre_cliente: nombreCliente,
                 ID_Producto: producto.ID_Producto,
@@ -460,28 +477,6 @@ const crearPedido = async (req, res) => {
                 fields: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Cantidad_pagar', 'Ubicacion', 'Fecha', 'Estatus']
             });
         }
-    } else {
-        const primerNoPedido = 1;
-    for (const producto of carrito) {
-        await pedidosModel.create({
-            No_pedido: primerNoPedido,
-            ID_Cliente: idCliente,
-            Nombre_cliente: nombreCliente,
-            ID_Producto: producto.ID_Producto,
-            Nombre_producto: producto.Nombre_producto,
-            Descripcion: producto.Descripcion,
-            Cantidad_producto: producto.Cantidad_producto,
-            Precio_unitario_producto: producto.Precio_unitario_producto,
-            Precio_total_productos: producto.Precio_total_productos,
-            Cantidad_pagar: producto.Cantidad_pagar,
-            Ubicacion: producto.Ubicacion,
-            Fecha: new Date(),
-            Estatus: 'Pendiente de pago'
-        }, {
-            fields: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Cantidad_pagar', 'Ubicacion', 'Fecha', 'Estatus'] 
-        });
-    }
-    }
 
         await carritoModel.destroy({
             where: {
@@ -489,8 +484,10 @@ const crearPedido = async (req, res) => {
             }
         });
 
-        const consultar_Pedidos = await pedidosModel.findAll({ where: {
-            ID_Cliente: idCliente},
+        const consultar_Pedidos = await pedidosModel.findAll({ 
+            where: {
+                ID_Cliente: idCliente
+            },
             attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Cantidad_pagar', 'Ubicacion', 'Fecha', 'Estatus']
         });
 
@@ -524,6 +521,7 @@ const crearPedido = async (req, res) => {
         res.status(500).send('Error interno del servidor');
     }  
 };
+
 
 const pedidosEnCurso = async (req, res) => {
 
@@ -816,11 +814,7 @@ const formularioActualizacion = (req, res) => {
     const Direccion = req.query.direccion;
     const Edad = req.query.edad;
     const Fecha_nacimiento = req.query.fechaNacimiento;
-    const Telefono = req.query.telefono;
-    const Correo = req.query.correo;
     const Rol = req.query.rol;
-    const Nombre_usuario = req.query.nombreUsuario;
-    const Contrasena = req.query.contrasena;
 
     res.render('formularioActualizacion',{
         titulo: 'Actualizar usuarios',
@@ -830,11 +824,7 @@ const formularioActualizacion = (req, res) => {
         Direccion,
         Edad,
         Fecha_nacimiento,
-        Telefono,
-        Correo,
-        Rol,
-        Nombre_usuario,
-        Contrasena
+        Rol
     })
 };
 
@@ -1218,24 +1208,19 @@ const actualizarUsuario = async (req, res) => {
     }
 
     const userId = req.params.id;
-    const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Telefono, Correo, Rol, Nombre_usuario, Contrasena} = req.body;
+    const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Rol} = req.body;
 
     try {
         const usuario = await usuarioModel.findByPk(userId);
 
         if (usuario) {
-            const passwordHash = await encrypt(Contrasena)
             await usuario.update({
                 Nombre,
                 Apellido,
                 Direccion,
                 Edad,
                 Fecha_nacimiento,
-                Telefono,
-                Correo,
-                Rol,
-                Nombre_usuario,
-                Contrasena: passwordHash
+                Rol
             });
 
             await logsUsuarioModel.create({
@@ -1717,11 +1702,8 @@ const actualizacionCliente = (req, res) => {
     const Apellido = req.query.apellido;
     const Direccion = req.query.direccion;
     const Edad = req.query.edad;
-    const Fecha_nacimiento = req.query.fechaNacimiento;
-    const Telefono = req.query.telefono;
-    const Correo = req.query.correo;
-    const Nombre_usuario = req.query.nombreUsuario;
-    const Contrasena = req.query.contrasena;
+    const Fecha_nacimiento = req.query.Fecha_nacimiento;
+
 
     res.render('actualizacionClientes',{
         titulo: 'Actualizar clientes',
@@ -1730,11 +1712,7 @@ const actualizacionCliente = (req, res) => {
         Apellido,
         Direccion,
         Edad,
-        Fecha_nacimiento,
-        Telefono,
-        Correo,
-        Nombre_usuario,
-        Contrasena
+        Fecha_nacimiento
     })
 };
 
@@ -1747,11 +1725,10 @@ const actualizarCliente = async (req, res) => {
     }
 
     const clienteId = req.params.id;
-    const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Telefono, Correo, Nombre_usuario, Contrasena} = req.body;
+    const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento} = req.body;
 
     try {
         const cliente = await clienteModel.findByPk(clienteId);
-        const passwordHash = await encrypt(Contrasena)
         if (cliente) {
 
             await cliente.update({
@@ -1759,11 +1736,7 @@ const actualizarCliente = async (req, res) => {
                 Apellido,
                 Direccion,
                 Edad,
-                Fecha_nacimiento,
-                Telefono,
-                Correo,
-                Nombre_usuario,
-                Contrasena: passwordHash
+                Fecha_nacimiento
             });
 
             await logsUsuarioModel.create({
@@ -1785,6 +1758,7 @@ const actualizarCliente = async (req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 };
+
 
 const eliminarCliente = async (req, res) => {
 

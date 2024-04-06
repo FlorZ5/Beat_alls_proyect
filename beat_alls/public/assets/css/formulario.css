@@ -2,10 +2,46 @@
 @import url(https://fonts.googleapis.com/css?family=Noto+Sans);
 
 
-body{
-	height: 100%; 
-	font-family: 'Noto Sans', sans-serif;
-  background-color: #2f70d2; 
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+}
+.container {
+	width: 90%;
+	margin: 0 auto;
+}
+.contact-form {
+	background-color: #00209e;
+	padding: 20px;
+	border-radius: 10px;
+	color: #fff;
+}
+.contact-form input,
+.contact-form button {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 10px;
+	border: none;
+	border-radius: 5px;
+}
+.obligatorio {
+	color: red;
+}
+@media only screen and (min-width: 768px) {
+	.contact-form {
+		max-width: 600px;
+		margin: 0 auto;
+	}
+	.contact-form input,
+	.contact-form button {
+		width: calc(50% - 10px);
+		margin-right: 10px;
+	}
+	.contact-form input:last-child,
+	.contact-form button {
+		margin-right: 0;
+	}
 }
 
 /* .container {
