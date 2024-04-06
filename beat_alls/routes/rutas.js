@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const paginas = require('../controllers/paginasController.js');
+const clientes = require('../controllers/clientesController.js');
+const usuarios = require('../controllers/usuariosController.js');
+const proveedores = require('../controllers/proveedoresController.js');
+const productos = require('../controllers/productosController.js');
+const pedidos = require('../controllers/pedidosController.js');
+const carrito = require('../controllers/carritoController.js');
 const authorizationMiddleware = require('../middlewares/authorizationMiddleware.js');
 const cargas = require('../controllers/upload.js')
 
@@ -26,93 +32,92 @@ router.post('/passChange', paginas.passChange);
 
 /*Aquí inicia el carrito*/
 
-router.get('/visualizarCarrito', authorizationMiddleware, paginas.visualizarCarrito);
+router.get('/visualizarCarrito', authorizationMiddleware, carrito.visualizarCarrito);
 
-router.post('/agregarAlCarrito', authorizationMiddleware, paginas.agregarAlCarrito);
+router.post('/agregarAlCarrito', authorizationMiddleware, carrito.agregarAlCarrito);
 
-router.get('/eliminarProductoCarrito/:id', paginas.eliminarProductoCarrito);
+router.get('/eliminarProductoCarrito/:id', carrito.eliminarProductoCarrito);
 
-router.get('/enviarCarrito', authorizationMiddleware, paginas.enviarCarrito);
+router.get('/enviarCarrito', authorizationMiddleware, carrito.enviarCarrito);
 
 /*Aquí finaliza el carrito*/
 
 /*Aquí inician los pedidos*/
 
-router.get('/crearPedido', authorizationMiddleware, paginas.crearPedido);
+router.get('/crearPedido', authorizationMiddleware, pedidos.crearPedido);
 
-router.get('/visualizarPedido', authorizationMiddleware, paginas.visualizarPedido);
+router.get('/visualizarPedido', authorizationMiddleware, pedidos.visualizarPedido);
 
-router.get('/cancelarPedido/:id', paginas.cancelarPedido);
+router.get('/cancelarPedido/:id', pedidos.cancelarPedido);
 
-router.get('/PedidosEnCurso', authorizationMiddleware, paginas.pedidosEnCurso);
+router.get('/PedidosEnCurso', authorizationMiddleware, pedidos.pedidosEnCurso);
 
-router.get('/actualizacionPedido', paginas.actualizacionPedido);
+router.get('/actualizacionPedido', pedidos.actualizacionPedido);
 
-router.post('/actualizacionPedido/:id', paginas.actualizarPedido);
+router.post('/actualizacionPedido/:id', pedidos.actualizarPedido);
 
 /*Aquí finalizan los pedidos*/
 
 /*Aquí inicia el historial*/
 
-router.get('/pedidosFinalizados', authorizationMiddleware, paginas.pedidosFinalizados);
-
+router.get('/pedidosFinalizados', authorizationMiddleware, pedidos.pedidosFinalizados);
 
 /*Aquí finaliza el historial*/
 
 /* Aquí inician las rutas del CRUD usuarios */
-router.get("/usuariosRegistrados", authorizationMiddleware, paginas.consultasUsuarios);
+router.get("/usuariosRegistrados", authorizationMiddleware, usuarios.consultasUsuarios);
 
-router.get("/registroUsuarios", authorizationMiddleware, paginas.registroUsuarios);
+router.get("/registroUsuarios", authorizationMiddleware, usuarios.registroUsuarios);
 
-router.post("/registroUsuarios", authorizationMiddleware, paginas.altasUsuario);
+router.post("/registroUsuarios", authorizationMiddleware, usuarios.altasUsuario);
 
-router.get("/formularioActualizacion", authorizationMiddleware, paginas.formularioActualizacion);
+router.get("/formularioActualizacion", authorizationMiddleware, usuarios.formularioActualizacion);
 
-router.post("/usuariosRegistrados/:id", paginas.actualizarUsuario);
+router.post("/usuariosRegistrados/:id", usuarios.actualizarUsuario);
 
-router.get("/usuariosRegistrados/:id", paginas.eliminarUsuario);
+router.get("/usuariosRegistrados/:id", usuarios.eliminarUsuario);
 /* Aquí terminan las rutas del CRUD usuarios */
 
 /* Aquí inician las rutas del CRUD clientes */
-router.get("/registroClientes", paginas.registroClientes);
+router.get("/registroClientes", clientes.registroClientes);
 
-router.post("/registroClientes", paginas.altasClientes);
+router.post("/registroClientes", clientes.altasClientes);
 
-router.get("/clientesRegistrados", authorizationMiddleware, paginas.consultasClientes);
+router.get("/clientesRegistrados", authorizationMiddleware, clientes.consultasClientes);
 
-router.get("/actualizacionClientes", authorizationMiddleware, paginas.actualizacionCliente);
+router.get("/actualizacionClientes", authorizationMiddleware, clientes.actualizacionCliente);
 
-router.post("/clientesRegistrados/:id", paginas.actualizarCliente);
+router.post("/clientesRegistrados/:id", clientes.actualizarCliente);
 
-router.get("/clientesRegistrados/:id", paginas.eliminarCliente);
+router.get("/clientesRegistrados/:id", clientes.eliminarCliente);
 /* Aquí terminan las rutas del CRUD clientes */
 
 /* Aquí inician las rutas del CRUD productos */
-router.get("/registroProductos", authorizationMiddleware, paginas.registroProductos);
+router.get("/registroProductos", authorizationMiddleware, productos.registroProductos);
 
-router.post("/registroProductos", authorizationMiddleware, cargas.upload, paginas.altasProductos);
+router.post("/registroProductos", authorizationMiddleware, cargas.upload, productos.altasProductos);
 
-router.get("/productosRegistrados", authorizationMiddleware, paginas.consultasProductos);
+router.get("/productosRegistrados", authorizationMiddleware, productos.consultasProductos);
 
-router.get("/actualizacionProductos", authorizationMiddleware, paginas.actualizacionProducto);
+router.get("/actualizacionProductos", authorizationMiddleware, productos.actualizacionProducto);
 
-router.post("/productosRegistrados/:id", paginas.actualizarProducto);
+router.post("/productosRegistrados/:id", productos.actualizarProducto);
 
-router.get("/productosRegistrados/:id", paginas.eliminarProducto);
+router.get("/productosRegistrados/:id", productos.eliminarProducto);
 /* Aquí terminan las rutas del CRUD productos */
 
 /* Aquí inician las rutas del CRUD proveedores */
-router.get("/registroProveedores", authorizationMiddleware, paginas.registroProveedores);
+router.get("/registroProveedores", authorizationMiddleware, proveedores.registroProveedores);
 
-router.post("/registroProveedores", authorizationMiddleware, cargas.upload, paginas.altasProveedores);
+router.post("/registroProveedores", authorizationMiddleware, cargas.upload, proveedores.altasProveedores);
 
-router.get("/proveedoresRegistrados", authorizationMiddleware, paginas.consultasProveedores);
+router.get("/proveedoresRegistrados", authorizationMiddleware, proveedores.consultasProveedores);
 
-router.get("/actualizacionProveedores", authorizationMiddleware, paginas.actualizacionProveedor);
+router.get("/actualizacionProveedores", authorizationMiddleware, proveedores.actualizacionProveedor);
 
-router.post("/proveedoresRegistrados/:id", paginas.actualizarProveedor);
+router.post("/proveedoresRegistrados/:id", proveedores.actualizarProveedor);
 
-router.get("/proveedoresRegistrados/:id", paginas.eliminarProveedor);
+router.get("/proveedoresRegistrados/:id", proveedores.eliminarProveedor);
 /* Aquí terminan las rutas del CRUD proveedores */
 
 /*Logs*/
