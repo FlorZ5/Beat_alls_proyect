@@ -20,13 +20,17 @@ router.post("/login", paginas.inicioSesion); // Realiza el inicio de sesión
 
 router.get('/logout', paginas.logOut);
 
+router.get('/reestablecerContra', paginas.reestablecerContra);
+
+router.post('/passChange', paginas.passChange);
+
 /*Aquí inicia el carrito*/
 
 router.get('/visualizarCarrito', authorizationMiddleware, paginas.visualizarCarrito);
 
 router.post('/agregarAlCarrito', authorizationMiddleware, paginas.agregarAlCarrito);
 
-router.get('/eliminarProductoCarrito/:id', authorizationMiddleware, paginas.eliminarProductoCarrito);
+router.get('/eliminarProductoCarrito/:id', paginas.eliminarProductoCarrito);
 
 router.get('/enviarCarrito', authorizationMiddleware, paginas.enviarCarrito);
 
@@ -100,7 +104,7 @@ router.get("/productosRegistrados/:id", paginas.eliminarProducto);
 /* Aquí inician las rutas del CRUD proveedores */
 router.get("/registroProveedores", authorizationMiddleware, paginas.registroProveedores);
 
-router.post("/registroProveedores", authorizationMiddleware, paginas.altasProveedores);
+router.post("/registroProveedores", authorizationMiddleware, cargas.upload, paginas.altasProveedores);
 
 router.get("/proveedoresRegistrados", authorizationMiddleware, paginas.consultasProveedores);
 

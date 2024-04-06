@@ -22,7 +22,8 @@ Nombre Varchar (30) not null,
 Apellido Varchar (30) not null,
 Telefono bigint not null unique,
 Correo Varchar (30) not null unique,
-Empresa Varchar (20) not null
+Empresa Varchar (20) not null,
+filepath Varchar (300) not null
 );
 go
 create table Productos

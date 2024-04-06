@@ -38,7 +38,9 @@
                                     <ul class="list-group list-group-flush">
                                       <li class="list-group-item"><center><%- producto.Precio_publico %></center></li>                 
                                     <div class="card-body">
-                                      <center><input type="number" name="cantidadPiezas" placeholder="Cantidad" value="1" style="text-align: center;"></center><br><br>
+                                      <center><input type="number" name="cantidadPiezas" placeholder="Cantidad" value="1" style="text-align: center;"></center><br>
+                                      <center><label for="">Piezas disponibles: </label></center>
+                                      <center><label for="" name="stock"><%- producto.Existencias %></label></center><br>
                                       <input type="hidden" name="ID_Producto" value="<%- producto.ID_Producto %>">
                                       <center><input type="submit" value="Añadir al carrito" style="height: auto; width: auto;"></center>
                                     </div>

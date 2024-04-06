@@ -22,7 +22,7 @@
 <body>
 <div class="contact_form">
     <div class="formulario">
-        <form action="/registroProveedores" method="post">
+        <form action="/registroProveedores" method="post" enctype="multipart/form-data">
             <label for="Nombre">Nombre</label>
             <input name="Nombre" id="Nombre" type="text">
             <br>
@@ -37,6 +37,9 @@
             <br>
             <label for="Empresa">Empresa</label>
             <input name="Empresa" id="Empresa" type="text">
+            <br>
+            <label for="IMG">Imagen</label>
+            <input name="IMG" id="IMG" type="file">
             <br><br>
             <button type="submit">Registrarse</button>
         </form>

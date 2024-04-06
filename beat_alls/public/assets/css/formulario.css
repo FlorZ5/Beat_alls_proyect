@@ -179,4 +179,19 @@ p{
 }
 
 
-/* creado por javiniguez.com, Julio 2019 */
+.contacto-form input[type="radio"] {
+    display: inline-block;
+    width: auto;
+    margin-right: 5px; /* Espacio entre el radio button y el texto */
+    vertical-align: middle; /* Alineación vertical con el texto */
+}
+
+.contacto-form label {
+    display: inline-block;
+    vertical-align: middle; /* Alineación vertical con el radio button */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el texto */
+}
+
+.contacto-form input[type="radio"] {
+    transform: scale(1.5); /* Ajusta el tamaño del radio button */
+}

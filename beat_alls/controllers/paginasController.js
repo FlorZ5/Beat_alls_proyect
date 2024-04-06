@@ -93,6 +93,45 @@ const Login = (req, res) => {
     });
 }
 
+const reestablecerContra = async (req, res) => {
+
+    res.render('reestablecerContra', {
+                titulo: "Reestablecer contraseña"
+    });
+}
+
+const passChange = async (req, res) => {
+    const { pregunta, Contrasena } = req.body;
+
+    try {
+        const usuario = await usuarioModel.findOne({ where: { Nombre_usuario: pregunta } });
+        if (usuario) {
+            const passwordHash = await encrypt(Contrasena);
+            await usuario.update({ Contrasena: passwordHash });
+            return res.render('login', {
+                titulo: "Login",
+                enc: "Inicia Sesión"
+            });
+        }
+
+        const cliente = await clienteModel.findOne({ where: { Nombre_usuario: pregunta } });
+        if (cliente) {
+            const passwordHash = await encrypt(Contrasena);
+            await cliente.update({ Contrasena: passwordHash });
+            return res.render('login', {
+                titulo: "Login",
+                enc: "Inicia Sesión"
+            });
+        }
+
+        return res.send('No se encontró ningún usuario o cliente con ese nombre de usuario.');
+    } catch (error) {
+        console.error('Error al cambiar la contraseña:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+};
+
+
 const inicioSesion = async (req, res) => {
     try {
         const { Login, Contrasena } = req.body;
@@ -249,7 +288,14 @@ const agregarAlCarrito = async (req, res) => {
 
     const idCliente = usuarioLogueado.ID_Cliente;
     const idProducto = req.body.ID_Producto;
+    let cantidadPiezas = parseInt(req.body.cantidadPiezas) || 1;
 
+    const producto = await productosModel.findByPk(idProducto);
+        const stockDisponible = producto.Existencias;
+
+        if (cantidadPiezas > stockDisponible) {
+            return res.status(400).json({ error: 'No hay suficiente stock para agregar la cantidad deseada al carrito' });
+        }
 
     let carritoProducto = await carritoModel.findOne({
         where: {
@@ -258,7 +304,6 @@ const agregarAlCarrito = async (req, res) => {
         }
     });
 
-    let cantidadPiezas = parseInt(req.body.cantidadPiezas) || 1;
     const consultar_Carrito = await carritoModel.findAll({ where: {
         ID_Cliente: idCliente 
     }});
@@ -385,23 +430,20 @@ const eliminarProductoCarrito = async (req, res) => {
 };
 
 const enviarCarrito = async (req, res) => {
-
     const usuarioLogueado = req.session.cliente;
-    const idCliente = usuarioLogueado.ID_Cliente;
 
     if (!usuarioLogueado) {
         return res.redirect('/login');
     }
-    const consultar_Carrito = await carritoModel.findAll({ where: {
-        ID_Cliente: idCliente 
-    }});
 
+    const idCliente = usuarioLogueado.ID_Cliente;
 
-    
-    if (!consultar_Carrito)
-    {
-        res.render('visualizarCarrito')
+    const consultar_Carrito = await carritoModel.findAll({ where: { ID_Cliente: idCliente } });
+
+    if (consultar_Carrito.length === 0) {
+        return res.redirect('/productos');
     }
+
     const totalPagar = consultar_Carrito.reduce((total, carrito) => total + carrito.Precio_total_productos, 0);
 
     res.render('crearPedido', {
@@ -409,8 +451,9 @@ const enviarCarrito = async (req, res) => {
         consultar_Carrito,
         titulo: "Pedido generado",
         enc: "Tu pedido"
-    })
+    });
 };
+
 
 /*                                           Fin de controladores para el carrito                                     */
 
@@ -459,6 +502,14 @@ const crearPedido = async (req, res) => {
         }  
 
         for (const producto of carrito) {
+            const productoDB = await productosModel.findByPk(producto.ID_Producto);
+            if (!productoDB) {
+                return res.status(400).json({ error: 'El producto no existe' });
+            }
+            if (productoDB.Existencias < producto.Cantidad_producto) {
+                return res.status(400).json({ error: `No hay suficiente stock para el producto ${producto.Nombre_producto}` });
+            }
+        
             await pedidosModel.create({
                 No_pedido: ultimoNoPedido,
                 ID_Cliente: idCliente,
@@ -475,6 +526,14 @@ const crearPedido = async (req, res) => {
                 Estatus: 'Pendiente de pago'
             }, {
                 fields: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Cantidad_pagar', 'Ubicacion', 'Fecha', 'Estatus']
+            });
+        
+            await productosModel.update({
+                Existencias: productoDB.Existencias - producto.Cantidad_producto
+            }, {
+                where: {
+                    ID_Producto: producto.ID_Producto
+                }
             });
         }
 
@@ -649,87 +708,104 @@ const actualizarPedido = async (req, res) => {
     }
 };
 
-const cancelarPedido = async (req, res) =>  {
-
+const cancelarPedido = async (req, res) => {
     const usuarioLogueado = req.session.cliente;
-    const NumPedido = req.params.id
+    const NumPedido = req.params.id;
+
     if (!usuarioLogueado) {
         return res.redirect('/login');
     }
 
-    try
-    {
-    const idCliente = usuarioLogueado.ID_Cliente;
+    try {
+        const idCliente = usuarioLogueado.ID_Cliente;
 
-    
-    const pedidos = await pedidosModel.findAll({ where: {
-        ID_Cliente: idCliente,
-        No_pedido: NumPedido
-    },
-        attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Fecha', 'Estatus']
-    });
+        // Obtener los productos asociados al pedido
+        const pedidos = await pedidosModel.findAll({
+            where: {
+                ID_Cliente: idCliente,
+                No_pedido: NumPedido
+            },
+            attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Ubicacion', 'Fecha', 'Estatus']
+        });
 
-    const cantidadPagarPorPedido = {};
-
-    pedidos.forEach(pedido => {
-        if (!cantidadPagarPorPedido[pedido.No_pedido]) {
-            cantidadPagarPorPedido[pedido.No_pedido] = 0;
+        // Incrementar las existencias de cada producto cancelado en la tabla de productos
+        for (const pedido of pedidos) {
+            await productosModel.increment('Existencias', {
+                by: pedido.Cantidad_producto,
+                where: {
+                    ID_Producto: pedido.ID_Producto
+                }
+            });
         }
-        cantidadPagarPorPedido[pedido.No_pedido] += pedido.Precio_total_productos;
-    });
 
-    for (const historial of pedidos) {
-        await historialModel.create({
-        No_pedido: historial.No_pedido,
-        ID_Cliente: usuarioLogueado.ID_Cliente,
-        Nombre_cliente: historial.Nombre_cliente,
-        ID_Producto: historial.ID_Producto,
-        Nombre_producto: historial.Nombre_producto,
-        Descripcion: historial.Descripcion,
-        Cantidad_producto: historial.Cantidad_producto,
-        Precio_unitario_producto: historial.Precio_unitario_producto,
-        Precio_total_productos: historial.Precio_total_productos,
-        Cantidad_pagar: cantidadPagarPorPedido,
-        Fecha: historial.Fecha,
-        Estatus: "Cancelado",
-        motivo_Cancelacion: "Cancelaste este pedido"
-    })
-    }
+        // Eliminar los registros del pedido cancelado de la tabla de pedidos
+        await pedidosModel.destroy({
+            where: {
+                No_pedido: NumPedido
+            }
+        });
 
-    await pedidosModel.destroy({
-        where: {
-            No_pedido: NumPedido
+        // Registro en el historial de cancelación
+        for (const pedido of pedidos) {
+            await historialModel.create({
+                No_pedido: pedido.No_pedido,
+                ID_Cliente: usuarioLogueado.ID_Cliente,
+                Nombre_cliente: usuarioLogueado.Nombre,
+                ID_Producto: pedido.ID_Producto,
+                Nombre_producto: pedido.Nombre_producto,
+                Descripcion: pedido.Descripcion,
+                Cantidad_producto: pedido.Cantidad_producto,
+                Precio_unitario_producto: pedido.Precio_unitario_producto,
+                Precio_total_productos: pedido.Precio_total_productos,
+                Cantidad_pagar: pedido.Precio_total_productos,
+                Fecha: pedido.Fecha,
+                Estatus: 'Cancelado',
+                motivo_Cancelacion: 'Cancelaste este pedido'
+            });
         }
-    })
 
-    const consultar_Pedidos = await pedidosModel.findAll({ where: {
-        ID_Cliente: idCliente},
-        attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Ubicacion', 'Fecha', 'Estatus']
-    });
+        // Registro en los logs
+        const pedidoCancelado = `Se cancela el pedido número ${NumPedido} por parte del cliente`;
+        await logsClienteModel.create({
+            ID_Cliente: idCliente,
+            Rol: usuarioLogueado.Rol,
+            Nombre_cliente: usuarioLogueado.Nombre,
+            Accion: 'Cancelación',
+            Descripcion: pedidoCancelado,
+            Fecha_hora: Date.now(),
+            IP: ipAddress
+        });
 
-    var pedidoCancelado = ("Se cancela pedido número " + NumPedido + " por parte del cliente");
+        // Obtener los pedidos actualizados para renderizar la vista
+        const consultar_Pedidos = await pedidosModel.findAll({
+            where: {
+                ID_Cliente: idCliente
+            },
+            attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Ubicacion', 'Fecha', 'Estatus']
+        });
 
-    await logsClienteModel.create({
-        ID_Cliente: idCliente,
-        Rol: usuarioLogueado.Rol,
-        Nombre_cliente: usuarioLogueado.Nombre,
-        Accion: "Cancelación",
-        Descripcion: pedidoCancelado,
-        Fecha_hora: Date.now(),
-        IP: ipAddress
-    })
+        // Calcular la cantidad a pagar por pedido
+        const cantidadPagarPorPedido = {};
+        consultar_Pedidos.forEach(pedido => {
+            if (!cantidadPagarPorPedido[pedido.No_pedido]) {
+                cantidadPagarPorPedido[pedido.No_pedido] = 0;
+            }
+            cantidadPagarPorPedido[pedido.No_pedido] += pedido.Precio_total_productos;
+        });
 
-    res.render('pedidoCliente', {
-        cantidadPagarPorPedido,
-        consultar_Pedidos,
-        titulo: "Mis pedidos",
-        enc: "Mis pedidos"
-    })
+        // Renderizar la vista con los pedidos actualizados
+        res.render('pedidoCliente', {
+            cantidadPagarPorPedido,
+            consultar_Pedidos,
+            titulo: 'Mis pedidos',
+            enc: 'Mis pedidos'
+        });
     } catch (error) {
-        console.error('Error al eliminar el pedido:', error);
+        console.error('Error al cancelar el pedido:', error);
         res.status(500).send('Error interno del servidor');
-    } 
-}
+    }
+};
+
 
 /*                                           Fin de controladores para los pedidos                                     */
 
@@ -1800,9 +1876,15 @@ const eliminarCliente = async (req, res) => {
 /*                                           Fin CRUD Clientes                                     */
 
 /*                                           CRUD Productos                                     */
-const registroProductos = (req, res)=>{//cada que se ponga la ruta raiz responde el router/para poder usar dicha ruta raiz se debe exportar
-    res.render('registroProductos', 
-    {titulo:'Registro de productos', 
+const registroProductos = async (req, res) => {
+
+    const consultar_Proveedor = await proveedorModel.findAll({
+        attributes: ['ID_Proveedor', 'filepath']
+    })
+
+    res.render('registroProductos', {
+    consultar_Proveedor,
+    titulo:'Registro de productos', 
     enc:'Registro de productos', 
     desc:'Complete el siguiente formulario para llevar a cabo el registro de los productos'});//no pone la ruta al estar cargado el EJS desde views, para que el elemento dentro de las llaves se debe mandar llamar desde el EJS
 }
@@ -1852,25 +1934,31 @@ const altasProductos = async (req, res) => {
         longitudExistencias=ExistenciasV.length;
         longitudID_Proveedor=ID_ProveedorV.length;
 
+        const consultar_Proveedor = await proveedorModel.findAll({
+            attributes: ['ID_Proveedor', 'filepath']
+        })
+
         if (Nombre_productoV==="" || DescripcionV==="" || ColorV==="" || TallaV==="" || MaterialV==="" || MarcaV==="" || TemporadaV==="" || PrecioV==="" || ExistenciasV==="" ||ID_ProveedorV==="") {
             console.log("Complete todos los campos");
             res.render('registroProductos',{
+            consultar_Proveedor,
             titulo:'Porductos registrados', 
             enc:'Productos registrados'});
 
         }
         else
         {
-            if (longitudNombre_producto>4 || longitudNombre_producto>30) {
+            if (longitudNombre_producto<4 || longitudNombre_producto>30) {
                 console.log("El nombre del producto debe tener una longitud entre 4 y 30 caracteres");
                 res.render('registroProductos',{
+                consultar_Proveedor,
                 titulo:'Porductos registrados', 
                 enc:'Productos registrados'});
             }
             else
             {
                 for (let index = 0; index < Nombre_productoV.length; index++) {
-                    extraeNombre=NombreV.charAt(index);
+                    extraeNombre=Nombre_productoV.charAt(index);
                     console.log(extraeNombre); 
                     Nombre_ProductoV_numbers=stringNumber.indexOf(extraeNombre);
                     Nombre_ProductoV_character=stringCharacter.indexOf(extraeNombre);
@@ -1880,6 +1968,7 @@ const altasProductos = async (req, res) => {
                 if (Nombre_ProductoV_character>=0) {
                     console.log("El nombre del producto no debe contener caracteres");
                     res.render('registroProductos',{
+                    consultar_Proveedor,
                     titulo:'Porductos registrados', 
                     enc:'Productos registrados'});
                 }
@@ -1888,6 +1977,7 @@ const altasProductos = async (req, res) => {
                     if (Nombre_ProductoV_numbers>=0) {
                         console.log("El nombre del producto no debe contener numeros");
                         res.render('registroProductos',{
+                        consultar_Proveedor,
                         titulo:'Porductos registrados', 
                         enc:'Productos registrados'});
                     }
@@ -1896,6 +1986,7 @@ const altasProductos = async (req, res) => {
                         if (longitudDescripcion<10 || longitudDescripcion>50) {
                             console.log("La descripcion del producto debe tener una longitud entre 10 y 50 caracteres");
                             res.render('registroProductos',{
+                            consultar_Proveedor,
                             titulo:'Porductos registrados', 
                             enc:'Productos registrados'}); 
                         }
@@ -1912,6 +2003,7 @@ const altasProductos = async (req, res) => {
                             if (DescripcionV_numbers>=0) {
                                 console.log("La descripcion del producto no debe contener numeros");
                                 res.render('registroProductos',{
+                                consultar_Proveedor,
                                 titulo:'Porductos registrados', 
                                 enc:'Productos registrados'});
                             }
@@ -1920,6 +2012,7 @@ const altasProductos = async (req, res) => {
                                 if (DescripcionV_character>=0) {
                                     console.log("La descripcion del producto no debe contener caracteres");
                                     res.render('registroProductos',{
+                                    consultar_Proveedor,
                                     titulo:'Porductos registrados', 
                                     enc:'Productos registrados'});  
                                 }
@@ -1928,6 +2021,7 @@ const altasProductos = async (req, res) => {
                                     if (longitudColor<4 || longitudColor>15) {
                                         console.log("La longitud del color debe ser entre 4 y 15 caracteres");
                                         res.render('registroProductos',{
+                                        consultar_Proveedor,
                                         titulo:'Porductos registrados', 
                                         enc:'Productos registrados'});
                                     }
@@ -1944,6 +2038,7 @@ const altasProductos = async (req, res) => {
                                         if (ColorV_numbers>=0) {
                                             console.log("El color no debe contener numeros");
                                             res.render('registroProductos',{
+                                            consultar_Proveedor,
                                             titulo:'Porductos registrados', 
                                             enc:'Productos registrados'});
                                         }
@@ -1952,6 +2047,7 @@ const altasProductos = async (req, res) => {
                                             if (ColorV_character>=0) {
                                                 console.log("El color no debe contener caracteres");
                                                 res.render('registroProductos',{
+                                                consultar_Proveedor,
                                                 titulo:'Porductos registrados', 
                                                 enc:'Productos registrados'});
                                             }
@@ -1960,6 +2056,7 @@ const altasProductos = async (req, res) => {
                                                 if (longitudTalla<2 || longitudTalla>20) {
                                                     console.log("La talla debe tener una longitud entre 2 y 20 caracteres");
                                                     res.render('registroProductos',{
+                                                    consultar_Proveedor,
                                                     titulo:'Porductos registrados', 
                                                     enc:'Productos registrados'});
                                                 }
@@ -1976,6 +2073,7 @@ const altasProductos = async (req, res) => {
                                                     if (TallaV_character>=0) {
                                                         console.log("La talla no debe contener caracteres especiales");
                                                         res.render('registroProductos',{
+                                                        consultar_Proveedor,
                                                         titulo:'Porductos registrados', 
                                                         enc:'Productos registrados'});
                                                     }
@@ -1984,6 +2082,7 @@ const altasProductos = async (req, res) => {
                                                         if (TallaV_numbers>=0) {
                                                             console.log("La talla no debe contener numeros");
                                                             res.render('registroProductos',{
+                                                            consultar_Proveedor,
                                                             titulo:'Porductos registrados', 
                                                             enc:'Productos registrados'});
                                                         }
@@ -1992,6 +2091,7 @@ const altasProductos = async (req, res) => {
                                                             if (longitudMaterial<5 || longitudMaterial>15) {
                                                                 console.log("La longitud del material debe estar ente los 5 y 15 caracteres");
                                                                 res.render('registroProductos',{
+                                                                consultar_Proveedor,
                                                                 titulo:'Porductos registrados', 
                                                                 enc:'Productos registrados'});
                                                             }
@@ -2008,6 +2108,7 @@ const altasProductos = async (req, res) => {
                                                                 if (MaterialV_numbers>=0) {
                                                                     console.log("El material no debe contener numeros");
                                                                     res.render('registroProductos',{
+                                                                    consultar_Proveedor,
                                                                     titulo:'Porductos registrados', 
                                                                     enc:'Productos registrados'});
                                                                 }
@@ -2016,6 +2117,7 @@ const altasProductos = async (req, res) => {
                                                                     if (MaterialV_character>=0) {
                                                                         console.log("El material no debe contener caracteres especiales");
                                                                         res.render('registroProductos',{
+                                                                        consultar_Proveedor,
                                                                         titulo:'Porductos registrados', 
                                                                         enc:'Productos registrados'});
                                                                     }
@@ -2024,6 +2126,7 @@ const altasProductos = async (req, res) => {
                                                                         if ( longitudMarca <4 || longitudMarca>25 ) {
                                                                             console.log("La longitud de la marca debe estar ente los 5 y 25 caracteres");
                                                                             res.render('registroProductos',{
+                                                                            consultar_Proveedor,
                                                                             titulo:'Porductos registrados', 
                                                                             enc:'Productos registrados'});
                                                                         }
@@ -2037,9 +2140,10 @@ const altasProductos = async (req, res) => {
                                                                                 console.log(MarcaV_numbers);  
                                                                                 console.log(MarcaV_character);   
                                                                             }
-                                                                            if (MarcaV_numbers>=0) {
+                                                                            if (MarcaV_numbers !== 0) {
                                                                                 console.log("La marca no debe contener numeros");
                                                                                 res.render('registroProductos',{
+                                                                                consultar_Proveedor,
                                                                                 titulo:'Porductos registrados', 
                                                                                 enc:'Productos registrados'});
                                                                             }
@@ -2048,6 +2152,7 @@ const altasProductos = async (req, res) => {
                                                                                 if (MarcaV_character>=0) {
                                                                                     console.log("La marca no debe contener caracteres especiales");
                                                                                     res.render('registroProductos',{
+                                                                                    consultar_Proveedor,
                                                                                     titulo:'Porductos registrados', 
                                                                                     enc:'Productos registrados'});
                                                                                 }
@@ -2056,6 +2161,7 @@ const altasProductos = async (req, res) => {
                                                                                     if (longitudTemporada<5 || longitudTemporada>30) {
                                                                                         console.log("La marca debe tener una longitud entre 5 y 30 caracteres");
                                                                                         res.render('registroProductos',{
+                                                                                        consultar_Proveedor,
                                                                                         titulo:'Porductos registrados', 
                                                                                         enc:'Productos registrados'});
                                                                                     }
@@ -2072,6 +2178,7 @@ const altasProductos = async (req, res) => {
                                                                                         if (TemporadaV_numbers>=0) {
                                                                                             console.log("La temporada no debe contener numeros");
                                                                                         res.render('registroProductos',{
+                                                                                        consultar_Proveedor,
                                                                                         titulo:'Porductos registrados', 
                                                                                         enc:'Productos registrados'});
                                                                                         }
@@ -2080,6 +2187,7 @@ const altasProductos = async (req, res) => {
                                                                                             if (TemporadaV_character>=0) {
                                                                                                 console.log("La temporada no debe contener caracteres especiales");
                                                                                             res.render('registroProductos',{
+                                                                                            consultar_Proveedor,
                                                                                             titulo:'Porductos registrados', 
                                                                                             enc:'Productos registrados'});
                                                                                             }
@@ -2088,6 +2196,7 @@ const altasProductos = async (req, res) => {
                                                                                                 if ( longitudPrecio<2 || longitudPrecio>4 ) {
                                                                                                     console.log("El precio debe tener una longitud entre 2 y 4 numeros");
                                                                                                     res.render('registroProductos',{
+                                                                                                    consultar_Proveedor,
                                                                                                     titulo:'Porductos registrados', 
                                                                                                     enc:'Productos registrados'});
                                                                                                 }
@@ -2104,6 +2213,7 @@ const altasProductos = async (req, res) => {
                                                                                                     if (TemporadaV_letters>=0) {
                                                                                                         console.log("El precio no debe contener letras");
                                                                                                         res.render('registroProductos',{
+                                                                                                        consultar_Proveedor,
                                                                                                         titulo:'Porductos registrados', 
                                                                                                         enc:'Productos registrados'});
                                                                                                     }
@@ -2112,14 +2222,16 @@ const altasProductos = async (req, res) => {
                                                                                                         if (TemporadaV_character>=0) {
                                                                                                             console.log("El precio no debe contener caracteres especiales");
                                                                                                             res.render('registroProductos',{
+                                                                                                            consultar_Proveedor,
                                                                                                             titulo:'Porductos registrados', 
                                                                                                             enc:'Productos registrados'});
                                                                                                         }
                                                                                                         else
                                                                                                         {
-                                                                                                            if ( longitudExistencias<2 || longitudExistencias>3 ) {
-                                                                                                                console.log("La longitus de las existencias debe tener entre 2  y 3 numeros");
+                                                                                                            if ( longitudExistencias<1 || longitudExistencias>4 ) {
+                                                                                                                console.log("La longitud de las existencias debe tener entre 1  y 4 digitos");
                                                                                                                 res.render('registroProductos',{
+                                                                                                                consultar_Proveedor,
                                                                                                                 titulo:'Porductos registrados', 
                                                                                                                 enc:'Productos registrados'});
                                                                                                             }
@@ -2136,6 +2248,7 @@ const altasProductos = async (req, res) => {
                                                                                                                 if (ExistenciasV_letters>=0) {
                                                                                                                     console.log("Las existencias no debe contener letras");
                                                                                                                     res.render('registroProductos',{
+                                                                                                                    consultar_Proveedor,
                                                                                                                     titulo:'Porductos registrados', 
                                                                                                                     enc:'Productos registrados'});
                                                                                                                 }
@@ -2144,17 +2257,10 @@ const altasProductos = async (req, res) => {
                                                                                                                     if (ExistenciasV_character>=0) {
                                                                                                                         console.log("Las existencias no debe contener caracteres especiales");
                                                                                                                         res.render('registroProductos',{
+                                                                                                                        consultar_Proveedor,
                                                                                                                         titulo:'Porductos registrados', 
                                                                                                                         enc:'Productos registrados'});
                                                                                                                     }
-                                                                                                                    else
-                                                                                                                    {
-                                                                                                                        if (longitudID_Proveedor<2 || longitudID_Proveedor>3) {
-                                                                                                                            console.log("La longitud de ID Proveedor debe ser de entre 2 y 3 cifras");
-                                                                                                                            res.render('registroProductos',{
-                                                                                                                            titulo:'Porductos registrados', 
-                                                                                                                            enc:'Productos registrados'});
-                                                                                                                        }
                                                                                                                         else
                                                                                                                         {
                                                                                                                             for (let index = 0; index < ID_ProveedorV.length; index++) {
@@ -2168,6 +2274,7 @@ const altasProductos = async (req, res) => {
                                                                                                                             if (ID_ProveedorV_letters>=0) {
                                                                                                                                 console.log("El ID Proveedor no debe contener letras");
                                                                                                                                 res.render('registroProductos',{
+                                                                                                                                consultar_Proveedor,
                                                                                                                                 titulo:'Porductos registrados', 
                                                                                                                                 enc:'Productos registrados'});
                                                                                                                             } 
@@ -2176,6 +2283,7 @@ const altasProductos = async (req, res) => {
                                                                                                                                 if (ID_ProveedorV_character>=0) {
                                                                                                                                     console.log("El ID Proveedor no debe contener caracteres especiales");
                                                                                                                                     res.render('registroProductos',{
+                                                                                                                                    consultar_Proveedor,
                                                                                                                                     titulo:'Porductos registrados', 
                                                                                                                                     enc:'Productos registrados'});
                                                                                                                                 }
@@ -2185,6 +2293,7 @@ const altasProductos = async (req, res) => {
                                                                                                                                     if (!proveedor) {
                                                                                                                                         console.log("El ID Proveedor no existe");
                                                                                                                                         res.render('registroProductos',{
+                                                                                                                                        consultar_Proveedor,
                                                                                                                                         titulo:'Porductos registrados', 
                                                                                                                                         enc:'Productos registrados'});
                                                                                                                                     }
@@ -2218,7 +2327,10 @@ const altasProductos = async (req, res) => {
                                                                                                                                             IP: ipAddress
                                                                                                                                         })
 
-                                                                                                                                        res.render('registroProductos');
+
+                                                                                                                                        res.render('registroProductos', {
+                                                                                                                                            consultar_Proveedor
+                                                                                                                                        });
                                                                                                                                     }
                                                                                                                                 }
                                                                                                                             }
@@ -2251,7 +2363,6 @@ const altasProductos = async (req, res) => {
                 }
             }
         }
-    } 
     catch (error) {
         console.error('Error al crear nuevo producto:', error);
         res.status(500).send('Error interno del servidor');
@@ -2480,7 +2591,7 @@ const altasProveedores = async (req, res) => {
                                 }
                                 else
                                 {
-                                    if (ApellidoV_character) {
+                                    if (ApellidoV_character>=0) {
                                         console.log("El apellido no debe contener caracteres especiales");
                                         res.render('registroProveedores', 
                                         {titulo:'Registro de proveedores', 
@@ -2502,9 +2613,7 @@ const altasProveedores = async (req, res) => {
                                                 extraeTelefono=TelefonoV.charAt(index);
                                                 console.log(extraeTelefono); 
                                                 TelefonoV_letters=numberLetter.indexOf(extraeTelefono);
-                                                TelefonoV_character=stringCharacter.indexOf(extraeTelefono);
-                                                console.log(EdadV_letters);  
-                                                console.log(EdadV_character);   
+                                                TelefonoV_character=stringCharacter.indexOf(extraeTelefono); 
                                             }
                                             if (TelefonoV_letters>=0) {
                                                 console.log("El telefono no debe contener letras");
@@ -2548,8 +2657,8 @@ const altasProveedores = async (req, res) => {
                                                         }
                                                         else
                                                         {
-                                                            if (longitudEmpesa<5 || longitudEmpesa>20) {
-                                                                console.log("El nombre de la empresa debe tener una longitud entre 5 y 20 caracteres");
+                                                            if (longitudEmpresa<3 || longitudEmpresa>20) {
+                                                                console.log("El nombre de la empresa debe tener una longitud entre  y 20 caracteres");
                                                                 res.render('registroProveedores', 
                                                                 {titulo:'Registro de proveedores', 
                                                                 enc:'Registro de proveedores', 
@@ -2581,13 +2690,16 @@ const altasProveedores = async (req, res) => {
                                                                         enc:'Registro de proveedores', 
                                                                         desc:'Complete el siguiente formulario para llevar a cabo el registro del proveedor'});
                                                                     }
+
+                                                                        const filepath = req.file.path;
                                                                         const nuevoProveedor = await proveedorModel.create(
                                                                             {
                                                                                 Nombre:NombreV,
                                                                                 Apellido:ApellidoV,
                                                                                 Telefono:TelefonoV, 
                                                                                 Correo:CorreoV, 
-                                                                                Empresa:EmpresaV
+                                                                                Empresa:EmpresaV,
+                                                                                filepath
                                                                             }
                                                                         );
 
@@ -2626,7 +2738,6 @@ const altasProveedores = async (req, res) => {
 
 const consultasProveedores = async (req, res) => {
     const consultar_Proveedor = await proveedorModel.findAll();
-    console.log(consultar_Proveedor);
     res.render('proveedoresRegistrados',
     {consultar_Proveedor,
     titulo:'Proveedores registrados', 
@@ -2792,6 +2903,8 @@ module.exports = {
     eliminarProveedor,
     Login,
     logOut,
+    reestablecerContra,
+    passChange,
     agregarAlCarrito,
     visualizarCarrito,
     eliminarProductoCarrito,

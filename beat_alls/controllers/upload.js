@@ -5,7 +5,7 @@ const storage = multer.diskStorage({
         cb(null, 'uploads')
     },
     filename: function (req, file, cb) {
-        const prefix = 'imagen_'; // Prefijo que se agregará al nombre del archivo
+        const prefix = 'imagen_';
         cb(null, prefix + Date.now() + file.originalname);
     }
 });

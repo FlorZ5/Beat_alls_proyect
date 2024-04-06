@@ -28,6 +28,10 @@ const proveedorModel = db.define('proveedor', {
     Empresa:{
         type: DataTypes.STRING,
         allowNull: false
+    },
+    filepath:{
+        type: DataTypes.STRING,
+        allowNull: false
     }
 }, 
 {
