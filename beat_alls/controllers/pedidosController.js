@@ -1,6 +1,7 @@
 const db = require('../config/db.js');
 const {Op, sequelize, where} = require('sequelize');
 const os = require('os');
+const Swal = require('sweetalert2');
 const {encrypt, compare} = require('../helpers/handleBcrypt.js');
 const productosModel = require('../models/productosModel.js');
 const carritoModel = require('../models/carritoModel.js');
@@ -203,6 +204,12 @@ const visualizarPedido = async (req, res) => {
 };
 
 const actualizacionPedido = (req, res) => {
+
+    const usuarioLogueado = req.session.usuario;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
     
     const No_pedido = req.query.id;
     const Ubicacion = req.query.ubicacion;
@@ -257,13 +264,14 @@ const actualizarPedido = async (req, res) => {
                 Descripcion: ("Se actualiza pedido número: " + noPedido),
                 Fecha_hora: Date.now(),
                 IP: ipAddress
-            })
-
-            res.render('pedidosEnCurso', {
-                consultar_Pedidos,
-                cantidadPagarPorPedido,
-                titulo: "Pedidos"
             });
+
+                res.render('pedidosEnCurso', {
+                    consultar_Pedidos,
+                    cantidadPagarPorPedido,
+                    titulo: "Pedidos"
+                });
+
     } catch (error) {
         console.error('Error al actualizar el pedido:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
@@ -281,7 +289,6 @@ const cancelarPedido = async (req, res) => {
     try {
         const idCliente = usuarioLogueado.ID_Cliente;
 
-        // Obtener los productos asociados al pedido
         const pedidos = await pedidosModel.findAll({
             where: {
                 ID_Cliente: idCliente,
@@ -290,7 +297,6 @@ const cancelarPedido = async (req, res) => {
             attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Ubicacion', 'Fecha', 'Estatus']
         });
 
-        // Incrementar las existencias de cada producto cancelado en la tabla de productos
         for (const pedido of pedidos) {
             await productosModel.increment('Existencias', {
                 by: pedido.Cantidad_producto,
@@ -300,14 +306,12 @@ const cancelarPedido = async (req, res) => {
             });
         }
 
-        // Eliminar los registros del pedido cancelado de la tabla de pedidos
         await pedidosModel.destroy({
             where: {
                 No_pedido: NumPedido
             }
         });
 
-        // Registro en el historial de cancelación
         for (const pedido of pedidos) {
             await historialModel.create({
                 No_pedido: pedido.No_pedido,
@@ -322,11 +326,10 @@ const cancelarPedido = async (req, res) => {
                 Cantidad_pagar: pedido.Precio_total_productos,
                 Fecha: pedido.Fecha,
                 Estatus: 'Cancelado',
-                motivo_Cancelacion: 'Cancelaste este pedido'
+                motivo_Cancelacion: 'Cancelación por parte del cliente'
             });
         }
 
-        // Registro en los logs
         const pedidoCancelado = `Se cancela el pedido número ${NumPedido} por parte del cliente`;
         await logsClienteModel.create({
             ID_Cliente: idCliente,
@@ -338,7 +341,6 @@ const cancelarPedido = async (req, res) => {
             IP: ipAddress
         });
 
-        // Obtener los pedidos actualizados para renderizar la vista
         const consultar_Pedidos = await pedidosModel.findAll({
             where: {
                 ID_Cliente: idCliente
@@ -346,7 +348,6 @@ const cancelarPedido = async (req, res) => {
             attributes: ['No_pedido', 'ID_Cliente', 'Nombre_cliente', 'ID_Producto', 'Nombre_producto', 'Descripcion', 'Cantidad_producto', 'Precio_unitario_producto', 'Precio_total_productos', 'Ubicacion', 'Fecha', 'Estatus']
         });
 
-        // Calcular la cantidad a pagar por pedido
         const cantidadPagarPorPedido = {};
         consultar_Pedidos.forEach(pedido => {
             if (!cantidadPagarPorPedido[pedido.No_pedido]) {
@@ -355,7 +356,6 @@ const cancelarPedido = async (req, res) => {
             cantidadPagarPorPedido[pedido.No_pedido] += pedido.Precio_total_productos;
         });
 
-        // Renderizar la vista con los pedidos actualizados
         res.render('pedidoCliente', {
             cantidadPagarPorPedido,
             consultar_Pedidos,

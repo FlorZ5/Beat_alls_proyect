@@ -20,14 +20,28 @@ Object.keys(interfaces).forEach((interfaceName) => {
 
 /*Ingreso al formulario para registro de usuarios*/
 const registroUsuarios = (req, res)=>{
+
+    const usuarioLogueado = req.session.usuario;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+
     res.render('registroUsuarios', 
     {titulo:'Registro de usuarios', 
     enc:'Registro de usuarios', 
-    desc:'Complete el siguiente formulario para llevar a cabo su registro'});//no pone la ruta al estar cargado el EJS desde views, para que el elemento dentro de las llaves se debe mandar llamar desde el EJS
+    desc:'Complete el siguiente formulario para llevar a cabo su registro'});
 }
 
 /*Controlador para acceder al formulario de actualización*/
 const formularioActualizacion = (req, res) => {
+
+    const usuarioLogueado = req.session.usuario;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+
     const ID_Usuario = req.query.id;
     const Nombre = req.query.nombre;
     const Apellido = req.query.apellido;
@@ -431,38 +445,191 @@ const actualizarUsuario = async (req, res) => {
     const {Nombre, Apellido, Direccion, Edad, Fecha_nacimiento, Rol} = req.body;
 
     try {
-        const usuario = await usuarioModel.findByPk(userId);
 
-        if (usuario) {
-            await usuario.update({
-                Nombre,
-                Apellido,
-                Direccion,
-                Edad,
-                Fecha_nacimiento,
-                Rol
-            });
+        const stringCharacter = ["'","-","`","~","!","¡","@","#","$","%","^","&","*","(",")","_","=","-","{","}","[","]","?","<",">",".",",","/","*","-","+",":",";",'"', "´", "°"] ;
+        const stringNumber ="0, 1, 2, 3, 4, 5, 6, 7, 8, 9";
+        const stringCharacterD = ["'","-","`","~","!","¡","@","#","$","%","^","&","*","(",")","_","=","-","{","}","[","]","?","<",">",".","/","*","-","+",":",";",'"', "´", "°"] ;
+        const stringCharacterC = ["'","-","`","~","!","¡","#","$","%","^","&","*","(",")","=","-","{","}","[","]","?","<",">",",","/","*","-","+",":",";",'"', "´", "°"] ;
+        const numberLetter= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        let NombreV;
+        let ApellidoV;
+        let DireccionV;
+        let EdadV;
+        NombreV=Nombre.trim();
+        ApellidoV=Apellido.trim();
+        DireccionV=Direccion.trim();
+        EdadV=Edad.trim();
+        longitudNombre=NombreV.length;
+        longitudApellido=ApellidoV.length;
+        longitudDireccion=DireccionV.length;
+        longitudEdad=EdadV.length; 
+            if (NombreV==="" || ApellidoV=="" || DireccionV=="" || EdadV=="") {
+                console.log("Complete todos los campos");
+                res.render('registroUsuarios',{
+                    titulo:'Usuarios registrados', 
+                    enc:'Usuarios registrados'});
+            }
+            else{  
+                if (longitudNombre<4 || longitudNombre>30) {
+                    console.log("El nombre solo debe tener una longitud entre 4 y 30 caracteres");
+                    res.render('registroUsuarios',{
+                        titulo:'Usuarios registrados', 
+                        enc:'Usuarios registrados'});
+                }
+                else
+                {
+                    for (let index = 0; index < NombreV.length; index++) {
+                        extraeNombre=NombreV.charAt(index);
+                        console.log(extraeNombre); 
+                        NombreV_numbers=stringNumber.indexOf(extraeNombre);
+                        NombreV_character=stringCharacter.indexOf(extraeNombre);
+                        console.log(NombreV_numbers);  
+                        console.log(NombreV_character);   
+                        }
+                    if (NombreV_numbers>=0) {
+                        console.log("El nombre no debe contener números");
+                        res.render('registroUsuarios',{
+                            titulo:'Usuarios registrados', 
+                            enc:'Usuarios registrados'});
+        
+                    }
+                    else
+                        { 
+                            if (NombreV_character>=0) {
+                                console.log("El nombre no debe contener caracteres");
+                                res.render('registroUsuarios',{
+                                    titulo:'Usuarios registrados', 
+                                    enc:'Usuarios registrados'});
+                            }
+                            else
+                            {
+                                if (longitudApellido<4 || longitudApellido>30) {
+                                    console.log("El apellido solo debe tener una longitud entre 4 y 30 caracteres");
+                                    res.render('registroUsuarios',{
+                                    titulo:'Usuarios registrados', 
+                                    enc:'Usuarios registrados'});
+                                }
+                                else
+                                {
+                                    for (let index = 0; index < ApellidoV.length; index++) {
+                                        extraeApellido=ApellidoV.charAt(index);
+                                        console.log(extraeApellido); 
+                                        ApellidoV_numbers=stringNumber.indexOf(extraeApellido);
+                                        ApellidoV_character=stringCharacter.indexOf(extraeApellido);
+                                        console.log(ApellidoV_numbers);  
+                                        console.log(ApellidoV_character);   
+                                    }
+                                        if (ApellidoV_numbers>=0) {
+                                            console.log("El apellido no debe contener números");
+                                            res.render('registroUsuarios',{
+                                            titulo:'Usuarios registrados', 
+                                            enc:'Usuarios registrados'});
+                                        }
+                                        else
+                                        { 
+                                            if (ApellidoV_character>=0) {
+                                                console.log("El apellido no debe contener caracteres");
+                                                res.render('registroUsuarios',{
+                                                titulo:'Usuarios registrados', 
+                                                enc:'Usuarios registrados'});
+                                            }
+                                            else
+                                            {
+                                                if (longitudDireccion<20 || longitudDireccion>75) {     
+                                                    console.log("La dirección debe tener una longitud entre 20 y 75 caracteres");
+                                                    res.render('registroUsuarios',{
+                                                    titulo:'Usuarios registrados', 
+                                                    enc:'Usuarios registrados'});  
+                                                }
+                                                else
+                                                {
+                                                    for (let index = 0; index < DireccionV.length; index++) {
+                                                        extraeDireccion=DireccionV.charAt(index);
+                                                        console.log(extraeDireccion); 
+                                                        DireccionV_character=stringCharacterD.indexOf(extraeDireccion);
+                                                        console.log(DireccionV_character);   
+                                                    }
+                                                    if (DireccionV_character>=0) {
+                                                        console.log("La direccion no debe contener caracteres especiales");
+                                                        res.render('registroUsuarios',{
+                                                        titulo:'Usuarios registrados', 
+                                                        enc:'Usuarios registrados'});
+                                                    }
+                                                    else
+                                                    {
+                                                        if (longitudEdad!=2) {
+                                                            console.log("La edad debe ser de dos digitos");
+                                                            res.render('registroUsuarios',{
+                                                            titulo:'Usuarios registrados', 
+                                                            enc:'Usuarios registrados'});
+                                                        }
+                                                        else
+                                                        {
+                                                            for (let index = 0; index < EdadV.length; index++) {
+                                                                extraeEdad=EdadV.charAt(index);
+                                                                console.log(extraeEdad); 
+                                                                EdadV_letters=numberLetter.indexOf(extraeEdad);
+                                                                EdadV_character=stringCharacter.indexOf(extraeEdad);
+                                                                console.log(EdadV_letters);  
+                                                                console.log(EdadV_character);   
+                                                            }
+                                                            if (EdadV_letters>=0) {
+                                                                console.log("La edad debe ser numerica");
+                                                                res.render('registroUsuarios',{
+                                                                titulo:'Usuarios registrados', 
+                                                                enc:'Usuarios registrados'});
+                                                            }
+                                                            else
+                                                            {
+                                                                if (EdadV_character>=0) {
+                                                                    console.log("La edad no debe contener caracteres especiales");
+                                                                    res.render('registroUsuarios',{
+                                                                    titulo:'Usuarios registrados', 
+                                                                    enc:'Usuarios registrados'});
+                                                                }
+                                                                    const usuario = await usuarioModel.findByPk(userId);
 
-            await logsUsuarioModel.create({
-                ID_Usuario: usuarioLogueado.ID_Usuario,
-                Rol: usuarioLogueado.Rol,
-                Nombre_usuario: usuarioLogueado.Nombre,
-                Accion: "Actualización",
-                Descripcion: ("Se actualizan datos del usuario: " + userId),
-                Fecha_hora: Date.now(),
-                IP: ipAddress
-            })
+                                                                    if (usuario) {
 
-            res.redirect('/usuariosRegistrados'); 
-        } else {
-            res.status(404).json({ error: 'No se encontró ningún usuario para actualizar' });
+                                                                        await usuario.update({
+                                                                            Nombre:NombreV,
+                                                                            Apellido:ApellidoV,
+                                                                            Direccion:DireccionV,
+                                                                            Edad:EdadV,
+                                                                            Fecha_nacimiento,
+                                                                            Rol
+                                                                        });
+
+                                                                        await logsUsuarioModel.create({
+                                                                            ID_Usuario: usuarioLogueado.ID_Usuario,
+                                                                            Rol: usuarioLogueado.Rol,
+                                                                            Nombre_usuario: usuarioLogueado.Nombre,
+                                                                            Accion: "Actualización",
+                                                                            Descripcion: ("Se actualizan datos del usuario: " + userId),
+                                                                            Fecha_hora: Date.now(),
+                                                                            IP: ipAddress
+                                                                        })
+
+                                                                        res.redirect('/usuariosRegistrados'); 
+                                                                    } else {
+                                                                        res.status(404).json({ error: 'No se encontró ningún usuario para actualizar' });
+                                                                    }
+                                                                }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
+    }
+}
     } catch (error) {
         console.error('Error al actualizar el usuario:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 }
-
 
 /*Controlador para baja de usuarios*/
 const eliminarUsuario = async (req, res) => {
@@ -505,6 +672,13 @@ const eliminarUsuario = async (req, res) => {
 
 /*Controlador para consulta de usuarios*/
 const consultasUsuarios = async (req, res) => {
+
+    const usuarioLogueado = req.session.usuario;
+
+    if (!usuarioLogueado) {
+        return res.redirect('/login');
+    }
+
     const consultar_User = await usuarioModel.findAll();
     console.log(consultar_User);
     res.render('usuariosRegistrados',

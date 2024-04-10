@@ -54,7 +54,7 @@
                                         <td><%= cliente.Correo %></td>
                                         <td><%= cliente.Nombre_usuario %></td>
                                         <td>
-                                            <a href="/clientesRegistrados/<%= cliente.ID_Cliente %>">Borrar</a>
+                                            <a style="color: red;" onclick=" return eliminar(<%= cliente.ID_Cliente %>)">Borrar</a>
                                             <a href="/actualizacionClientes?id=<%= cliente.ID_Cliente %>&nombre=<%= cliente.Nombre %>&apellido=<%= cliente.Apellido %>&direccion=<%= cliente.Direccion %>&edad=<%= cliente.Edad %>&Fecha_nacimiento=<%= cliente.Fecha_nacimiento %>">Actualizar</a>
                                         </td>
                                     </tr>
@@ -67,6 +67,38 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+        <script>
+        
+            function eliminar(id)
+            {
+                Swal.fire({
+                    title: '¿Quieres eliminar el cliente?',
+                    text: "Si eliminas el registro no podras revertir la accion",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Eliminar",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        window.location= '/clientesRegistrados/'+id;
+                        Swal.fire({
+                            title: "Eliminado!",
+                            text: "El registro ha sido eliminado",
+                            icon: "success",
+                            showConfirmButton: false,
+                            time:3000
+                        });
+                        setTimeout(function(){
+                            window.location= '/clientesReistrados';
+                        },1000)
+                    }
+                })
+            }
+
+        </script>
 </body>
 <footer>
     <%- include('./layout/footer.ejs'); -%>

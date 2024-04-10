@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
+	<link rel="shortcut icon" type="image/png" href="/assets/images/LOGO5.png">
     <link rel="stylesheet" href="/assets/css/formulario.css">
     <title>Actualización de proveedor</title>
 </head>
@@ -23,34 +23,34 @@
 <div class="contact_form">
     <div class="formulario">
     <div class="container">
-        <form action="/proveedoresRegistrados/<%- ID_Proveedor %>" method="post">
+        <form action="/proveedoresRegistrados/<%- ID_Proveedor %>" method="post" onsubmit="return validarFormulario()">
             <div class="mb-3">
                 <label for="Nombre" class="form-label">Nombre:</label>
-                <input name="Nombre" id="Nombre" class="form-control" type="text" value="<%- Nombre %>">
+                <input name="Nombre" id="Nombre" class="form-control" type="text" value="<%- Nombre %>" placeholder="Entre 4 y 30 caracteres.">
                 <span class="form-text">Nombre actual: <%- Nombre %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Apellido" class="form-label">Apellido:</label>
-                <input name="Apellido" id="Apellido" class="form-control" type="text" value="<%- Apellido %>">
+                <input name="Apellido" id="Apellido" class="form-control" type="text" value="<%- Apellido %>" placeholder="Entre 4 y 30 caracteres.">
                 <span class="form-text">Apellido actual: <%- Apellido %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Telefono" class="form-label">Telefono:</label>
-                <input name="Telefono" id="Telefono" class="form-control" type="text" value="<%- Telefono %>">
+                <input name="Telefono" id="Telefono" class="form-control" type="text" value="<%- Telefono %>" placeholder="10 digitos">
                 <span class="form-text">Telefono: <%- Telefono %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Correo" class="form-label">Correo electrónico:</label>
-                <input name="Correo" id="Correo" class="form-control" type="email" value="<%- Correo %>">
+                <input name="Correo" id="Correo" class="form-control" type="email" value="<%- Correo %>" placeholder="user@mail.com">
                 <span class="form-text">Correo: <%- Correo %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Empresa" class="form-label">Empresa:</label>
-                <input name="Empresa" id="Empresa" class="form-control" type="text" value="<%- Empresa %>">
+                <input name="Empresa" id="Empresa" class="form-control" type="text" value="<%- Empresa %>" placeholder="Entre 3 y 20 caracteres.">
                 <span class="form-text">Empresa: <%- Empresa %></span>
             </div>
 
@@ -64,4 +64,78 @@
 <footer>
     <%- include('./layout/footer.ejs'); %>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+<script>
+    function validarFormulario() {
+        // Obtener los valores de los campos
+        var nombre = document.getElementById('Nombre').value.trim();
+        var apellido = document.getElementById('Apellido').value.trim();
+        var telefono = document.getElementById('Telefono').value.trim();
+        var correo = document.getElementById('Correo').value.trim();
+        var empresa = document.getElementById('Empresa').value.trim();
+
+        // Validar que ningún campo esté vacío
+        if (nombre === '' || apellido === '' || telefono === '' || correo === '' || empresa === '') {
+            mostrarError('Ningún campo debe estar vacío.');
+            return false;
+        }
+
+        if (!validarLongitud(nombre, 4, 30) || !soloLetrasYEspacios(nombre)) {
+            mostrarError('El campo "Nombre" debe contener entre 4 y 30 caracteres y solo letras.');
+            return false;
+        }
+
+        if (!validarLongitud(apellido, 4, 30) || !soloLetrasYEspacios(apellido)) {
+            mostrarError('El campo "Apellido" debe contener entre 4 y 30 caracteres y solo letras.');
+            return false;
+        }
+
+        if (!validarTelefono(telefono)) {
+            mostrarError('El campo "Telefono" debe contener exactamente 10 dígitos y no debe contener letras ni símbolos.');
+            return false;
+        }
+
+        if (!validarCorreo(correo)) {
+            mostrarError('El campo "Correo" debe tener un formato válido (user@mail.com) y contener entre 10 y 30 caracteres.');
+            return false;
+        }
+
+        if (!validarEmpresa(empresa)) {
+            mostrarError('El campo "Empresa" debe contener entre 3 y 20 caracteres y solo letras.');
+            return false;
+        }
+
+        // Si todas las validaciones pasan, devuelve true para enviar el formulario
+        return true;
+    }
+
+    function mostrarError(mensaje) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: mensaje,
+            confirmButtonText: 'Aceptar'
+        });
+    }
+
+    function validarLongitud(valor, min, max) {
+        return valor.length >= min && valor.length <= max;
+    }
+
+    function soloLetrasYEspacios(valor) {
+        return /^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]*$/.test(valor);
+    }
+
+    function validarTelefono(valor) {
+        return /^\d{10}$/.test(valor);
+    }
+
+    function validarCorreo(valor) {
+        return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(valor) && valor.length >= 10 && valor.length <= 30;
+    }
+
+    function validarEmpresa(valor) {
+        return /^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]*$/.test(valor) && valor.length >= 3 && valor.length <= 20;
+    }
+</script>
 </html>

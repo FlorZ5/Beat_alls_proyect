@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
+	<link rel="shortcut icon" type="image/png" href="/assets/images/LOGO5.png">
     <link rel="stylesheet" href="/assets/css/formulario.css">
     <title>Actualizar usuario</title>
 </head>
@@ -23,28 +23,28 @@
 <div class="contact_form">
     <div class="formulario">
     <div class="container">
-        <form action="/usuariosRegistrados/<%- ID_Usuario %>" method="post">
+        <form action="/usuariosRegistrados/<%- ID_Usuario %>" method="post" onsubmit="return validarFormulario()">
             <div class="mb-3">
                 <label for="Nombre" class="form-label">Nombre:</label>
-                <input name="Nombre" id="Nombre" class="form-control" type="text" value="<%- Nombre %>">
+                <input name="Nombre" id="Nombre" class="form-control" type="text" value="<%- Nombre %>" placeholder="Entre 4 y 30 caracteres.">
                 <span class="form-text">Nombre actual: <%- Nombre %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Apellido" class="form-label">Apellido:</label>
-                <input name="Apellido" id="Apellido" class="form-control" type="text" value="<%- Apellido %>">
+                <input name="Apellido" id="Apellido" class="form-control" type="text" value="<%- Apellido %>" placeholder="Entre 4 y 30 caracteres.">
                 <span class="form-text">Apellido actual: <%- Apellido %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Direccion" class="form-label">Dirección:</label>
-                <input name="Direccion" id="Direccion" class="form-control" type="text" value="<%- Direccion %>">
+                <input name="Direccion" id="Direccion" class="form-control" type="text" value="<%- Direccion %>" placeholder="Entre 20 y 75 caracteres.">
                 <span class="form-text">Dirección actual: <%- Direccion %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Edad" class="form-label">Edad:</label>
-                <input name="Edad" id="Edad" class="form-control" type="text" value="<%- Edad %>">
+                <input name="Edad" id="Edad" class="form-control" type="text" value="<%- Edad %>" placeholder="2 digitos.">
                 <span class="form-text">Edad actual: <%- Edad %></span>
             </div>
 
@@ -73,4 +73,64 @@
 <footer>
     <%- include('./layout/footer.ejs'); %>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+<script>
+    function validarFormulario() {
+        var nombre = document.getElementById('Nombre').value.trim();
+        var apellido = document.getElementById('Apellido').value.trim();
+        var direccion = document.getElementById('Direccion').value.trim();
+        var edad = document.getElementById('Edad').value.trim();
+
+        if (nombre === '' || apellido === '' || direccion === '' || edad === '') {
+            mostrarError('Ningún campo debe estar vacío.');
+            return false;
+        }
+
+        if (!validarLongitud(nombre, 4, 30) || !soloLetrasYEspacios(nombre)) {
+            mostrarError('El nombre debe contener entre 4 y 30 caracteres, solo letras, espacios entre palabras y acentos.');
+            return false;
+        }
+
+        if (!validarLongitud(apellido, 4, 30) || !soloLetrasYEspacios(apellido)) {
+            mostrarError('El apellido debe contener entre 4 y 30 caracteres, solo letras, espacios entre palabras y acentos.');
+            return false;
+        }
+
+        if (!validarLongitud(direccion, 20, 75) || !soloLetrasNumerosYEspacios(direccion)) {
+            mostrarError('La dirección debe contener entre 20 y 75 caracteres, y solo puede contener letras, números y el símbolo "#".');
+            return false;
+        }
+
+        if (!validarEdad(edad)) {
+            mostrarError('La edad debe tener únicamente 2 dígitos.');
+            return false;
+        }
+
+        return true;
+    }
+
+    function mostrarError(mensaje) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: mensaje
+        });
+    }
+
+    function validarLongitud(cadena, min, max) {
+        return cadena.length >= min && cadena.length <= max;
+    }
+
+    function soloLetrasYEspacios(cadena) {
+        return /^[a-zA-ZáéíóúÁÉÍÓÚ\s]*$/.test(cadena);
+    }
+
+    function soloLetrasNumerosYEspacios(cadena) {
+        return /^[a-zA-ZáéíóúÁÉÍÓÚ0-9\s#]*$/.test(cadena);
+    }
+
+    function validarEdad(edad) {
+        return /^\d{2}$/.test(edad);
+    }
+</script>
 </html>

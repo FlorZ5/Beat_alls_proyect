@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
+	<link rel="shortcut icon" type="image/png" href="/assets/images/LOGO5.png">
     <link rel="stylesheet" href="/assets/css/formulario.css">
     <title>Actualizar producto</title>
 </head>
@@ -23,58 +23,63 @@
 <div class="contact_form">
     <div class="formulario">
     <div class="container">
-        <form action="/productosRegistrados/<%- ID_Producto %>" method="post">
+        <form action="/productosRegistrados/<%- ID_Producto %>" method="post" onsubmit="return validarFormulario()">
             <div class="mb-3">
                 <label for="Nombre_producto" class="form-label">Nombre del producto:</label>
-                <input name="Nombre_producto" id="Nombre_producto" class="form-control" type="text" value="<%- Nombre_producto %>">
+                <input name="Nombre_producto" id="Nombre_producto" class="form-control" type="text" value="<%- Nombre_producto %>" placeholder="Entre 4 y 30 caracteres.">
                 <span class="form-text">Nombre del producto actual: <%- Nombre_producto %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Descripcion" class="form-label">Descripción:</label>
-                <input name="Descripcion" id="Descripcion" class="form-control" type="text" value="<%- Descripcion %>">
+                <input name="Descripcion" id="Descripcion" class="form-control" type="text" value="<%- Descripcion %>" placeholder="Entre 10 y 50 caracteres.">
                 <span class="form-text">Descripción actual: <%- Descripcion %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Color" class="form-label">Color:</label>
-                <input name="Color" id="Color" class="form-control" type="text" value="<%- Color %>">
+                <input name="Color" id="Color" class="form-control" type="text" value="<%- Color %>" placeholder="Entre 4 y 15 caracteres.">
                 <span class="form-text">Color actual: <%- Color %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Talla" class="form-label">Talla:</label>
-                <input name="Talla" id="Talla" class="form-control" type="text" value="<%- Talla %>">
+                <input name="Talla" id="Talla" class="form-control" type="text" value="<%- Talla %>" placeholder="Entre 2 y 20 caracteres.">
                 <span class="form-text">Talla actual: <%- Talla %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Material" class="form-label">Material:</label>
-                <input name="Material" id="Material" class="form-control" type="text" value="<%- Material %>">
+                <input name="Material" id="Material" class="form-control" type="text" value="<%- Material %>" placeholder="Entre 5 y 15 caracteres.">
                 <span class="form-text">Material actual: <%- Material %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Marca" class="form-label">Marca:</label>
-                <input name="Marca" id="Marca" class="form-control" type="text" value="<%- Marca %>">
+                <input name="Marca" id="Marca" class="form-control" type="text" value="<%- Marca %>" placeholder="Entre 5 y 25 caracteres.">
                 <span class="form-text">Marca: <%- Marca %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Temporada" class="form-label">Temporada:</label>
-                <input name="Temporada" id="Temporada" class="form-control" type="text" value="<%- Temporada %>">
+                <select name="Temporada" id="Temporada" value="<%- Temporada %>">
+                    <option value="Primavera">Primavera</option>
+                    <option value="Verano">Verano</option>
+                    <option value="Otoño">Otoño</option>
+                    <option value="Invierno">Invierno</option>
+                </select>
                 <span class="form-text">Temporada actual: <%- Temporada %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Existencias" class="form-label">Existencias:</label>
-                <input name="Existencias" id="Existencias" class="form-control" type="text" value="<%- Existencias %>">
+                <input name="Existencias" id="Existencias" class="form-control" type="number" value="<%- Existencias %>" placeholder="Ingresa un valor numérico.">
                 <span class="form-text">Existencias actuales: <%- Existencias %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Precio" class="form-label">Precio:</label>
-                <input name="Precio" id="Precio" class="form-control" type="text" value="<%- Precio %>">
+                <input name="Precio" id="Precio" class="form-control" type="number" value="<%- Precio %>" placeholder="Ingresa un valor numérico.">
                 <span class="form-text">Precio actual: <%- Precio %></span>
             </div>
             <input type="hidden" name="_method" value="put">
@@ -87,4 +92,98 @@
 <footer>
     <%- include('./layout/footer.ejs'); %>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+<script>
+    function validarFormulario() {
+        // Obtener los valores de los campos
+        var nombre = document.getElementById('Nombre_producto').value.trim();
+        var descripcion = document.getElementById('Descripcion').value.trim();
+        var color = document.getElementById('Color').value.trim();
+        var talla = document.getElementById('Talla').value.trim();
+        var material = document.getElementById('Material').value.trim();
+        var marca = document.getElementById('Marca').value.trim();
+        var precio = document.getElementById('Precio').value.trim();
+        var existencias = document.getElementById('Existencias').value.trim();
+
+        // Validar que ningún campo esté vacío
+        if (nombre === '' || descripcion === '' || color === '' || talla === '' || material === '' || marca === '' || precio === '' || existencias === '') {
+            mostrarError('Ningún campo debe estar vacío.');
+            return false;
+        }
+
+        // Validar longitud y caracteres para cada campo
+        if (!validarLongitud(nombre, 4, 30) || !soloLetrasYEspacios(nombre)) {
+            mostrarError('El campo "Nombre del producto" debe contener entre 4 y 30 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarLongitud(descripcion, 10, 50) || !soloLetrasYEspacios(descripcion) || !noContieneSimbolosNiNumeros(descripcion)) {
+            mostrarError('El campo "Descripción" debe tener entre 10 y 50 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarLongitud(color, 4, 15) || !soloLetrasYEspacios(color)) {
+            mostrarError('El campo "Color" debe tener entre 4 y 15 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarLongitud(talla, 2, 20) || !soloLetrasYEspacios(talla)) {
+            mostrarError('El campo "Talla" debe tener entre 2 y 20 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarLongitud(material, 5, 15) || !soloLetrasYEspacios(material)) {
+            mostrarError('El campo "Material" debe tener entre 5 y 15 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarLongitud(marca, 5, 25) || !soloLetrasYEspacios(marca)) {
+            mostrarError('El campo "Marca" debe tener entre 5 y 25 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarPrecio(precio)) {
+            mostrarError('El campo "Precio" debe contener entre 2 y 4 dígitos y no debe contener letras ni símbolos.');
+            return false;
+        }
+
+        if (!validarExistencias(existencias)) {
+            mostrarError('El campo "Existencias" debe contener entre 1 y 4 dígitos y no debe contener letras ni símbolos.');
+            return false;
+        }
+
+        // Si todas las validaciones pasan, devuelve true para enviar el formulario
+        return true;
+    }
+
+    function mostrarError(mensaje) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: mensaje,
+            confirmButtonText: 'Aceptar'
+        });
+    }
+
+    function validarLongitud(valor, min, max) {
+        return valor.length >= min && valor.length <= max;
+    }
+
+    function soloLetrasYEspacios(valor) {
+        return /^[a-zA-Z\s]*$/.test(valor);
+    }
+
+    function noContieneSimbolosNiNumeros(valor) {
+        return /^[a-zA-Z\s]*$/.test(valor);
+    }
+
+    function validarPrecio(valor) {
+        return /^\d{2,4}$/.test(valor);
+    }
+
+    function validarExistencias(valor) {
+        return /^\d{1,4}$/.test(valor);
+    }
+</script>
+
 </html>

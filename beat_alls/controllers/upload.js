@@ -1,4 +1,5 @@
 const multer = require('multer');
+const path = require('path');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -10,7 +11,17 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({storage: storage})
+const upload = multer({
+    storage: storage,
+    fileFilter: function (req, file, cb) {
+        // Verificar la extensión del archivo
+        const filetypes = /jpeg|jpg|png/;
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        if (extname) {
+            return cb(null, true);
+        }
+    }
+});
 
 exports.upload = upload.single('IMG');
 

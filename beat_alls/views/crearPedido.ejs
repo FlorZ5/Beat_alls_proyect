@@ -1,11 +1,10 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta charset="UTF-8">
     <meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="Responsive Bootstrap4 Shop Template, https://imransdesign.com/">
-	<link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
+	<link rel="shortcut icon" type="image/png" href="/assets/images/LOGO5.png">
     <link rel="stylesheet" href="/assets/css/formulario.css">
     <title><%= titulo %></title> 
 </head>
@@ -22,10 +21,10 @@
 </header>
 <body>
     <div class="cart-section mt-50 mb-50">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-8 col-md-12">
-					<div class="cart-table-wrap">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-12">
+                    <div class="cart-table-wrap">
                         <table class="cart-table">
                             <thead class="cart-table-head">
                                 <tr class="table-head-row">
@@ -52,8 +51,7 @@
                                 <tr class="table-body-row">
                                     <td><%= totalPagar %></td>
                                 </tr>
-                                <tr class="table-body-row">
-                                    <td class="product-total"><button type="button" style="border-radius: 15px;"><a href="/crearPedido" style="text-decoration: none; color: black;">Finalizar pedido</a></button></td>
+                                 <td class="product-total"><button id="finalizarPedidoBtn" type="button" style="border-radius: 15px;">Finalizar pedido</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -67,5 +65,33 @@
 <footer>
     <%- include('./layout/footer.ejs'); -%>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+<script>
+    document.getElementById('finalizarPedidoBtn').addEventListener('click', function() {
+        Swal.fire({
+            title: '¿Estás seguro de finalizar la compra?',
+            text: "No podrás revertir esta acción una vez confirmada.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, finalizar compra',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/crearPedido';
+                Swal.fire({
+                    title: "Finalizado!",
+                    text: "Tu pedido ha finalizado",
+                    icon: "success",
+                });
+                setTimeout(function(){
+                    window.location= '/pedidosEnCurso';
+                },1000)
+                // Redireccionar al usuario después de finalizar la compra
+                window.location.href = '/crearPedido'; // Cambiar la URL según tu aplicación
+            }
+        });
+    });
+</script>
 </html>

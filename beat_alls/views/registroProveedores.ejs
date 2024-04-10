@@ -1,12 +1,12 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta charset="UTF-8">
     <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
-    <link rel="stylesheet" href="/assets/css/formulario.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Proveedores registrados</title>
+    <link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
+    <link rel="stylesheet" href="/assets/css/formulario.css">
 </head>
 <header>
     <%- include('./layout/nav.ejs'); %>
@@ -22,24 +22,25 @@
 <body>
 <div class="contact_form">
     <div class="formulario">
-        <form action="/registroProveedores" method="post" enctype="multipart/form-data">
+        <form action="/registroProveedores" method="post" enctype="multipart/form-data" onsubmit="return validarFormulario()">
             <label for="Nombre">Nombre</label>
-            <input name="Nombre" id="Nombre" type="text">
+            <input name="Nombre" id="Nombre" type="text" placeholder="Entre 4 y 30 caracteres.">
             <br>
             <label for="Apellido">Apellido</label>
-            <input name="Apellido" id="Apellido" type="text">
+            <input name="Apellido" id="Apellido" type="text" placeholder="Entre 4 y 30 caracteres.">
             <br>
-            <label for="Telefono">Telefono</label>
-            <input name="Telefono" id="Telefono" type="text">
+            <label for="Telefono">Teléfono</label>
+            <input name="Telefono" id="Telefono" type="text" placeholder="10 dígitos">
             <br>
             <label for="Correo">Correo electrónico</label>
-            <input name="Correo" id="Correo" type="email">
+            <input name="Correo" id="Correo" type="email" placeholder="user@gmail.com">
             <br>
             <label for="Empresa">Empresa</label>
-            <input name="Empresa" id="Empresa" type="text">
+            <input name="Empresa" id="Empresa" type="text" placeholder="Entre 3 y 20 caracteres.">
             <br>
             <label for="IMG">Imagen</label>
-            <input name="IMG" id="IMG" type="file">
+            <input name="IMG" id="IMG" type="file" accept="image/png, image/jpeg">
+            <span>Formatos válidos: JPEG, JPG, PNG</span>
             <br><br>
             <button type="submit">Registrarse</button>
         </form>
@@ -49,4 +50,75 @@
 <footer>
     <%- include('./layout/footer.ejs'); %>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+<script>
+    function validarFormulario(event){
+        // Obtener los valores de los campos del formulario
+        const nombre = document.getElementById('Nombre').value.trim();
+        const apellido = document.getElementById('Apellido').value.trim();
+        const telefono = document.getElementById('Telefono').value.trim();
+        const correo = document.getElementById('Correo').value.trim();
+        const empresa = document.getElementById('Empresa').value.trim();
+
+        // Validar nombre
+        if (nombre === '' || descripcion === '' || color === '' || talla === '' || material === '' || marca === '' || precio === '' || existencias === '') {
+            mostrarError('Ningún campo debe estar vacío.');
+            event.preventDefault(); // Detiene el envío del formulario
+            return false;
+        }
+
+        // Validar apellido
+        if (apellido.length < 4 || apellido.length > 30 || /\d/.test(apellido) || /[^\w\s]/.test(apellido)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce un apellido válido entre 4 y 30 caracteres que no contenga números ni caracteres especiales.'
+            });
+            return false;
+        }
+
+        // Validar teléfono
+        if (telefono.length !== 10 || isNaN(telefono) || /\D/.test(telefono)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce un número de teléfono válido de 10 dígitos numéricos.'
+            });
+            return false;
+        }
+
+        // Validar correo
+        if (correo.length < 15 || correo.length > 30 || /[^\w\s@.]/.test(correo)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce un correo electrónico válido entre 10 y 30 caracteres que no contenga caracteres especiales.'
+            });
+            return false;
+        }
+
+        // Validar nombre de la empresa
+        if (empresa.length < 3 || empresa.length > 20 || /\d/.test(empresa) || /[^\w\s]/.test(empresa)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce un nombre de empresa válido entre 3 y 20 caracteres que no contenga números ni caracteres especiales.'
+            });
+            return false;
+        }
+
+        // Si todas las validaciones pasan, el formulario se envía y mostramos una alerta de éxito
+        Swal.fire({
+            icon: 'success',
+            title: 'Registro exitoso',
+            text: 'El proveedor se ha registrado correctamente.'
+        }).then(() => {
+                if (result.isConfirmed) {
+                    window.location.href = "/registroProveedores"; 
+                    // Reemplaza "/ruta-del-formulario" con la URL correcta de tu formulario
+                }
+        });
+
+    }
+</script>
 </html>

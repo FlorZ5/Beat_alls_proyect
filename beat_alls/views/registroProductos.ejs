@@ -1,11 +1,11 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta charset="UTF-8">
     <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Registro de productos</title>
-	<link rel="shortcut icon" type="image/png" href="/assets/images/LOGO5.png">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registro de productos</title>
+    <link rel="shortcut icon" type="image/png" href="/assets/images/LOGO5.png">
     <link rel="stylesheet" href="/assets/css/formulario.css">
 </head>
 <header>
@@ -22,53 +22,159 @@
 <body>
 <div class="contact_form">
     <div class="formulario">
-    <form action="/registroProductos" method="post" enctype="multipart/form-data">
-        <label for="Nombre">Nombre del producto</label>
-        <input name="Nombre_producto" id="Nombre_producto" type="text">
-        <br>
-        <label for="Descripcion">Descripción</label>
-        <input name="Descripcion" id="Descripcion" type="text">
-        <br>
-        <label for="Color">Color</label>
-        <input name="Color" id="Color" type="text">
-        <br>
-        <label for="Talla">Talla</label>
-        <input name="Talla" id="Talla" type="text">
-        <br>
-        <label for="Material">Material</label>
-        <input name="Material" id="Material" type="text">
-        <br>
-        <label for="Marca">Marca</label>
-        <input name="Marca" id="Marca" type="text">
-        <br>
-        <label for="Temporada">Temporada</label>
-        <input name="Temporada" id="Temporada" type="text">
-        <br>
-        <label for="Precio">Precio</label>
-        <input name="Precio" id="Precio" type="text">
-        <br>
-        <label for="Existencias">Existencias</label>
-        <input name="Existencias" id="Existencias" type="text">
-        <br>
-        <label for="ID_Proveedor">ID Proveedor</label>
-        <% consultar_Proveedor.forEach(proveedor => { %>
-            <div class="contacto-form">
-                <input type="radio" name="ID_Proveedor" value="<%= proveedor.ID_Proveedor %>" class="radio-btn">
-                <label for="<%= proveedor.ID_Proveedor %>" class="proveedor-label">
-                    <img height="100" width="100" src="<%= proveedor.filepath %>" alt="Descripción de la imagen" class="proveedor-img">
-                </label>
-            </div>
-        <% }); %>      
-        <br>
-        <label for="IMG">Imagen</label>
-        <input name="IMG" id="IMG" type="file">
-        <br><br>
-        <button type="submit">Registrar producto</button>
-    </form> 
+        <form id="registroForm" action="/registroProductos" method="post" enctype="multipart/form-data">
+            <label for="Nombre">Nombre del producto</label>
+            <input name="Nombre_producto" id="Nombre_producto" type="text" placeholder="Entre 4 y 30 caracteres.">
+            <br>
+            <label for="Descripcion">Descripción</label>
+            <input name="Descripcion" id="Descripcion" type="text" placeholder="Entre 10 y 50 caracteres.">
+            <br>
+            <label for="Color">Color</label>
+            <input name="Color" id="Color" type="text" placeholder="Entre 4 y 15 caracteres.">
+            <br>
+            <label for="Talla">Talla</label>
+            <input name="Talla" id="Talla" type="text" placeholder="Entre 2 y 20 caracteres.">
+            <br>
+            <label for="Material">Material</label>
+            <input name="Material" id="Material" type="text" placeholder="Entre 5 y 15 caracteres.">
+            <br>
+            <label for="Marca">Marca</label>
+            <input name="Marca" id="Marca" type="text" placeholder="Entre 5 y 25 caracteres.">
+            <br>
+            <label for="Temporada">Temporada</label><br>
+            <select name="Temporada" id="Temporada">
+                <option value="Primavera">Primavera</option>
+                <option value="Verano">Verano</option>
+                <option value="Otoño">Otoño</option>
+                <option value="Invierno">Invierno</option>
+            </select>
+            <br>
+            <label for="Precio">Precio</label>
+            <input name="Precio" id="Precio" type="text" placeholder="Ingresa un valor numérico.">
+            <br>
+            <label for="Existencias">Existencias</label>
+            <input name="Existencias" id="Existencias" type="text" placeholder="Ingresa un valor numérico.">
+            <br>
+            <label for="ID_Proveedor">ID Proveedor</label>
+            <% consultar_Proveedor.forEach(proveedor => { %>
+                <div class="contacto-form">
+                    <input type="radio" name="ID_Proveedor" value="<%= proveedor.ID_Proveedor %>" class="radio-btn" checked>
+                    <label for="<%= proveedor.ID_Proveedor %>" class="proveedor-label">
+                        <img height="100" width="100" src="<%= proveedor.filepath %>" alt="Descripción de la imagen" class="proveedor-img">
+                    </label>
+                </div>
+            <% }); %>      
+            <br>
+            <label for="IMG">Imagen</label>
+            <input name="IMG" id="IMG" type="file" accept="image/png, image/jpeg">
+            <span>Formatos validos: JPEG, JPG, PNG</span>
+            <br><br>
+            <button type="button" onclick="validarYEnviarFormulario()">Registrar producto</button>
+        </form> 
     </div>
 </div>
 </body>
 <footer>
     <%- include('./layout/footer.ejs'); %>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+<script>
+    function validarYEnviarFormulario() {
+        // Obtener los valores de los campos
+        var nombre = document.getElementById('Nombre_producto').value.trim();
+        var descripcion = document.getElementById('Descripcion').value.trim();
+        var color = document.getElementById('Color').value.trim();
+        var talla = document.getElementById('Talla').value.trim();
+        var material = document.getElementById('Material').value.trim();
+        var marca = document.getElementById('Marca').value.trim();
+        var precio = document.getElementById('Precio').value.trim();
+        var existencias = document.getElementById('Existencias').value.trim();
+
+        // Validar que ningún campo esté vacío
+        if (nombre === '' || descripcion === '' || color === '' || talla === '' || material === '' || marca === '' || precio === '' || existencias === '') {
+            mostrarError('Ningún campo debe estar vacío.');
+            return false;
+        }
+
+        // Validar longitud y caracteres para cada campo
+        if (!validarLongitud(nombre, 4, 30) || !soloLetrasYEspacios(nombre)) {
+            mostrarError('El campo "Nombre del producto" debe contener entre 4 y 30 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarLongitud(descripcion, 10, 50) || !soloLetrasYEspacios(descripcion) || !noContieneSimbolosNiNumeros(descripcion)) {
+            mostrarError('El campo "Descripción" debe tener entre 10 y 50 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarLongitud(color, 4, 15) || !soloLetrasYEspacios(color)) {
+            mostrarError('El campo "Color" debe tener entre 4 y 15 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarLongitud(talla, 2, 20) || !soloLetrasYEspacios(talla)) {
+            mostrarError('El campo "Talla" debe tener entre 2 y 20 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarLongitud(material, 5, 15) || !soloLetrasYEspacios(material)) {
+            mostrarError('El campo "Material" debe tener entre 5 y 15 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarLongitud(marca, 5, 25) || !soloLetrasYEspacios(marca)) {
+            mostrarError('El campo "Marca" debe tener entre 5 y 25 caracteres y no debe contener símbolos ni números.');
+            return false;
+        }
+
+        if (!validarPrecio(precio)) {
+            mostrarError('El campo "Precio" debe contener entre 2 y 4 dígitos y no debe contener letras ni símbolos.');
+            return false;
+        }
+
+        if (!validarExistencias(existencias)) {
+            mostrarError('El campo "Existencias" debe contener entre 1 y 4 dígitos y no debe contener letras ni símbolos.');
+            return false;
+        }
+
+        // Validar si se ha cargado una imagen
+        var imagen = document.getElementById('IMG').files[0];
+        if (!imagen) {
+            mostrarError('Debe seleccionar una imagen.');
+            return false;
+        }
+
+        // Si todas las validaciones pasan, envía el formulario
+        document.getElementById('registroForm').submit();
+    }
+
+    function mostrarError(mensaje) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: mensaje,
+            confirmButtonText: 'Aceptar'
+        });
+    }
+
+    function validarLongitud(valor, min, max) {
+        return valor.length >= min && valor.length <= max;
+    }
+
+    function soloLetrasYEspacios(valor) {
+        return /^[a-zA-Z\sáéíóúÁÉÍÓÚ]*$/.test(valor);
+    }
+
+    function noContieneSimbolosNiNumeros(valor) {
+        return /^[a-zA-Z\sáéíóúÁÉÍÓÚ]*$/.test(valor);
+    }
+
+    function validarPrecio(valor) {
+        return /^\d{2,4}$/.test(valor);
+    }
+
+    function validarExistencias(valor) {
+        return /^\d{1,4}$/.test(valor);
+    }
+</script>
 </html>

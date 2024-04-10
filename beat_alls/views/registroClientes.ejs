@@ -1,13 +1,12 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta charset="UTF-8">
     <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="Responsive Bootstrap4 Shop Template, https://imransdesign.com/">
-	<link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/png" href="/assets/images/LOGO5.png">
     <link rel="stylesheet" href="/assets/css/formulario.css">
-	<title>Registro</title>
+    <title>Registro</title>
 </head>
 <header>
     <%- include('./layout/nav.ejs'); %>
@@ -21,43 +20,107 @@
     <%- include('./layout/diseñoregistro.ejs'); %>
 </header>
 <body>
-<div class="contact_form">
-    <div class="formulario">		
-        <h3 style="color: rgb(131, 163, 251); font-family: Rockwell;">¡Hola! Bienvenid@, registrate</h3>
-    <form action="/registroClientes" method="post">
-        <label for="Nombre" style="color: aliceblue;">Nombre</label>
-        <input name="Nombre" id="Nombre" type="text">
-        <br>
-        <label for="Apellido" style="color: aliceblue;">Apellido</label>
-        <input name="Apellido" id="Apellido" type="text">
-        <br>
-        <label for="Direccion" style="color: aliceblue;">Dirección</label>
-        <input name="Direccion" id="Direccion" type="text">
-        <br>
-        <label for="Edad" style="color: aliceblue;">Edad</label>
-        <input name="Edad" id="Edad" type="text">
-        <br>
-        <label for="Fecha_nacimiento" style="color: aliceblue;">Fecha de nacimiento</label>
-        <input name="Fecha_nacimiento" id="Fecha_nacimiento" type="date" value="2000-01-01">
-        <br>
-        <label for="Telefono" style="color: aliceblue;">Telefono</label>
-        <input name="Telefono" id="Telefono" type="text">
-        <br>
-        <label for="Correo" style="color: aliceblue;">Correo electrónico</label>
-        <input name="Correo" id="Correo" type="email">
-        <br>
-        <label for="Nombre_usuario" style="color: aliceblue;">Usuario</label>
-        <input name="Nombre_usuario" id="Nombre_usuario" type="text">
-        <br>
-        <label for="Contrasena" style="color: aliceblue;">Contraseña</label>
-        <input name="Contrasena" id="Contrasena" type="password">
-        <br><br>
-        <button type="submit" style="color: aliceblue;">Registrarse</button>
-    </form> 
+    <div class="contact_form">
+        <div class="formulario">      
+            <h3 style="color: rgb(131, 163, 251); font-family: Rockwell;">¡Hola! Bienvenid@, regístrate</h3>
+            <form id="myForm" action="/registroClientes" method="post">
+                <label for="Nombre" style="color: aliceblue;">Nombre</label>
+                <input name="Nombre" id="Nombre" type="text" placeholder="Entre 4 y 30 caracteres.">
+                <br>
+                <label for="Apellido" style="color: aliceblue;">Apellido</label>
+                <input name="Apellido" id="Apellido" type="text" placeholder="Entre 4 y 30 caracteres.">
+                <br>
+                <label for="Direccion" style="color: aliceblue;">Dirección</label>
+                <input name="Direccion" id="Direccion" type="text" placeholder="Entre 20 y 75 caracteres">
+                <br>
+                <label for="Edad" style="color: aliceblue;">Edad</label>
+                <input name="Edad" id="Edad" type="text" placeholder="Ingresa solo números">
+                <br>
+                <label for="Fecha_nacimiento" style="color: aliceblue;">Fecha de nacimiento</label>
+                <input name="Fecha_nacimiento" id="Fecha_nacimiento" type="date" value="2000-01-01">
+                <br>
+                <label for="Telefono" style="color: aliceblue;">Telefono</label>
+                <input name="Telefono" id="Telefono" type="text" placeholder="10 dígitos">
+                <br>
+                <label for="Correo" style="color: aliceblue;">Correo electrónico</label>
+                <input name="Correo" id="Correo" type="email" placeholder="user@mail.com">
+                <br>
+                <label for="Nombre_usuario" style="color: aliceblue;">Usuario</label>
+                <input name="Nombre_usuario" id="Nombre_usuario" type="text" placeholder="Entre 8 y 15 caracteres">
+                <br>
+                <label for="Contrasena" style="color: aliceblue;">Contraseña</label>
+                <input name="Contrasena" id="Contrasena" type="password" placeholder="8 caracteres">
+                <br><br>
+                <button type="submit" style="color: aliceblue;">Registrarse</button>
+            </form> 
+        </div>
     </div>
-</div>
 </body>
 <footer>
-    <%- include('./layout/footer.ejs'); %>
+    <% include('./layout/footer.ejs'); %>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+<script>
+    document.getElementById('myForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const nombre = document.getElementById('Nombre').value;
+        const apellido = document.getElementById('Apellido').value;
+        const direccion = document.getElementById('Direccion').value;
+        const edad = document.getElementById('Edad').value;
+        const telefono = document.getElementById('Telefono').value;
+        const correo = document.getElementById('Correo').value;
+        const usuario = document.getElementById('Nombre_usuario').value;
+        const contrasena = document.getElementById('Contrasena').value;
+
+        const nombreRegExp = /^[a-zA-Z\s]+$/;
+        const apellidoRegExp = /^[a-zA-Z\s]+$/;
+        const direccionRegExp = /^(?!\s*$)[a-zA-Z0-9# ]+$/;
+        const edadRegExp = /^\d{2}$/;
+        const telefonoRegExp = /^\d{10}$/;
+        const correoRegExp = /^[\w.-]+@[a-zA-Z]+\.[a-zA-Z]+$/;
+        const usuarioRegExp = /^[a-zA-Z]+$/;
+        const contrasenaRegExp = /^[a-zA-Z0-9]+$/;
+
+        if (nombre.trim() === '' || apellido.trim() === '' || direccion.trim() === '' || edad.trim() === '' || telefono.trim() === '' || correo.trim() === '' || usuario.trim() === '' || contrasena.trim() === '') {
+            mostrarError('Ningún campo puede estar vacío.');
+        } else if (!nombreRegExp.test(nombre)) {
+            mostrarError('El nombre solo debe contener letras.');
+        } else if (!apellidoRegExp.test(apellido)) {
+            mostrarError('El apellido solo debe contener letras.');
+        } else if (!direccionRegExp.test(direccion)) {
+            mostrarError('La dirección solo puede incluir letras, números y #.');
+        } else if (!edadRegExp.test(edad)) {
+            mostrarError('La edad debe tener exactamente 2 dígitos.');
+        } else if (!telefonoRegExp.test(telefono)) {
+            mostrarError('El teléfono debe contener exactamente 10 dígitos numéricos.');
+        } else if (!correoRegExp.test(correo)) {
+            mostrarError('Correo electrónico inválido.');
+        } else if (!usuarioRegExp.test(usuario)) {
+            mostrarError('El usuario solo debe contener letras.');
+        } else if (!contrasenaRegExp.test(contrasena)) {
+            mostrarError('La contraseña no debe incluir símbolos.');
+        } else {
+            Swal.fire({
+                icon: 'success',
+                title: 'Registro Exitoso',
+                text: 'Usuario creado exitosamente.',
+                confirmButtonText: 'Enviar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        }
+    });
+
+    function mostrarError(mensaje) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: mensaje
+        });
+    }
+</script>
 </html>

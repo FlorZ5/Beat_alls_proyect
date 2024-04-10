@@ -43,7 +43,7 @@
                                 <td class="product-name"><%= carrito.Precio_unitario_producto %></td>
                                 <td class="product-name"><%= carrito.Precio_total_productos %></td>
                                 <td class="product-name">
-                                    <a href="/eliminarProductoCarrito/<%= carrito.ID_Producto %>">Borrar</a>
+                                    <a onclick="eliminar(<%= carrito.ID_Producto %>)">Borrar</a>
                                 </td>
                             </tr>
                         <% }); %>
@@ -64,6 +64,36 @@
 </div>
 </div>
     <br>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+        <script>
+        
+            function eliminar(id)
+            {
+                Swal.fire({
+                    title: '¿Quieres eliminar el producto?',
+                    text: "Si eliminas el registro no podras revertir la accion",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Eliminar",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        window.location= '/eliminarProductoCarrito/'+id;
+                        Swal.fire({
+                            title: "Eliminado!",
+                            text: "El producto ha sido eliminado",
+                            icon: "success",
+                            time:3000
+                        });
+                        setTimeout(function(){
+                        },1000)
+                    }
+                })
+            }
+
+        </script>
 </body>
 <footer>
     <%- include('./layout/footer.ejs'); -%>

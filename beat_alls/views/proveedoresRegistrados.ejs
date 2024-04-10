@@ -48,10 +48,10 @@
                                     <td class="product-name"><%= proveedor.Correo %></td>
                                     <td class="product-name"><%= proveedor.Empresa %></td>
                                     <td>
-                                        <button type="button" style="border-radius: 15px; width: auto;"><a href="/actualizacionProveedores?id=<%= proveedor.ID_Proveedor %>&nombre=<%= proveedor.Nombre %>&apellido=<%= proveedor.Apellido %>&telefono=<%= proveedor.Telefono %>&correo=<%= proveedor.Correo %>&empresa=<%= proveedor.Empresa %>" style="text-decoration: none; color: black;">Actualizar</a></button>
+                                        <a href="/actualizacionProveedores?id=<%= proveedor.ID_Proveedor %>&nombre=<%= proveedor.Nombre %>&apellido=<%= proveedor.Apellido %>&telefono=<%= proveedor.Telefono %>&correo=<%= proveedor.Correo %>&empresa=<%= proveedor.Empresa %>" style="text-decoration: none; color: blue;">Actualizar</a>
                                     </td>
                                     <td class="product-name">
-                                        <button type="button" style="border-radius: 15px; width: auto;"><a href="/proveedoresRegistrados/<%= proveedor.ID_Proveedor %>" style="text-decoration: none; color: black;">Borrar</a></button>
+                                        <a onclick="eliminar(<%= proveedor.ID_Proveedor %>)" style="text-decoration: none; color: red;">Borrar</a>
                                     </td>
                                 </tr>
                             <% }); %>
@@ -64,6 +64,55 @@
     </div>
 </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+<script>
+    function eliminar(id) {
+        Swal.fire({
+            title: '¿Quieres eliminar el proveedor?',
+            text: "Si eliminas el registro no podrás revertir la acción",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Eliminar",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/proveedoresRegistrados/' + id, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        Swal.fire({
+                            title: "Eliminado!",
+                            text: "El proveedor ha sido eliminado",
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                        setTimeout(() => {
+                            window.location = '/proveedoresRegistrados';
+                        }, 1000);
+                    } else {
+                        throw new Error('No se pudo eliminar el proveedor');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al eliminar el proveedor:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Hubo un error al eliminar el proveedor.',
+                        icon: 'error'
+                    });
+                });
+            }
+        }).catch(error => {
+            console.error('Error al mostrar la ventana modal:', error);
+        });
+    }
+</script>
+
 <footer>
     <%- include('./layout/footer.ejs'); -%>
 </footer>

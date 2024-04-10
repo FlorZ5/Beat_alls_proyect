@@ -1,11 +1,10 @@
 <html lang="es">
 <head>
-	<meta charset="UTF-8">
     <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="Responsive Bootstrap4 Shop Template, https://imransdesign.com/">
-	<link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Responsive Bootstrap4 Shop Template, https://imransdesign.com/">
+    <link rel="shortcut icon" type="image/png" href="/assets/images/Imagen2.png">
     <link rel="stylesheet" href="/assets/css/formulario.css">
     <title>Registro de usuarios</title>
 </head>
@@ -23,7 +22,7 @@
 <body>
 <div class="contact_form">
     <div class="formulario">
-    <form action="/registroUsuarios" method="post">
+    <form action="/registroUsuarios" method="post" onsubmit="return validarFormulario()">
         <label for="Nombre">Nombre</label>
         <input name="Nombre" id="Nombre" type="text">
         <br>
@@ -39,7 +38,7 @@
         <label for="Fecha_nacimiento">Fecha de nacimiento</label>
         <input name="Fecha_nacimiento" id="Fecha_nacimiento" type="date" value="2000-01-01">
         <br>
-        <label for="Telefono">Telefono</label>
+        <label for="Telefono">Teléfono</label>
         <input name="Telefono" id="Telefono" type="text">
         <br>
         <label for="Correo">Correo electrónico</label>
@@ -62,6 +61,122 @@
     </div>
 </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+<script>
+    function validarFormulario() {
+        // Obtener los valores de los campos del formulario
+        const nombre = document.getElementById('Nombre').value.trim();
+        const apellido = document.getElementById('Apellido').value.trim();
+        const direccion = document.getElementById('Direccion').value.trim();
+        const edad = document.getElementById('Edad').value.trim();
+        const telefono = document.getElementById('Telefono').value.trim();
+        const correo = document.getElementById('Correo').value.trim();
+        const nombreUsuario = document.getElementById('Nombre_usuario').value.trim();
+        const contrasena = document.getElementById('Contrasena').value.trim();
+
+        // Validar nombre
+        if (nombre.length < 4 || nombre.length > 30 || /\d/.test(nombre) || /[^a-zA-Z\s]/.test(nombre)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce un nombre válido entre 4 y 30 caracteres que no contenga números ni caracteres especiales.'
+            });
+            return false;
+        }
+
+        // Validar apellido
+        if (apellido.length < 4 || apellido.length > 30 || /\d/.test(apellido) || /[^a-zA-Z\s]/.test(apellido)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce un apellido válido entre 4 y 30 caracteres que no contenga números ni caracteres especiales.'
+            });
+            return false;
+        }
+
+        // Validar dirección
+        if (direccion.length < 20 || direccion.length > 75 || /[^a-zA-Z0-9\s]/.test(direccion)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce una dirección válida entre 20 y 75 caracteres que no contenga caracteres especiales.'
+            });
+            return false;
+        }
+
+        // Validar edad
+        if (edad.length !== 2 || isNaN(edad) || /[^\d]/.test(edad)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce una edad válida de dos dígitos numéricos.'
+            });
+            return false;
+        }
+
+        // Validar teléfono
+        if (telefono.length !== 10 || isNaN(telefono) || /\D/.test(telefono)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce un número de teléfono válido de 10 dígitos numéricos.'
+            });
+            return false;
+        }
+
+        // Validar correo
+        if (correo.length < 10 || correo.length > 30 ||/[^a-zA-Z0-9@._-]+/
+        .test(correo)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce un correo electrónico válido entre 10 y 30 caracteres que no contenga caracteres especiales.'
+            });
+            return false;
+        }
+
+        // Validar nombre de usuario
+        if (nombreUsuario.length < 8 || nombreUsuario.length > 15 || /\d/.test(nombreUsuario) || /[\W_]+/.test(nombreUsuario)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce un nombre de usuario válido entre 8 y 15 caracteres que no contenga números ni caracteres especiales.'
+            });
+            return false;
+        }
+
+        // Validar contraseña
+        if (contrasena.length !== 8 || /[\W_]+/.test(contrasena)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor, introduce una contraseña válida de 8 caracteres alfanuméricos que no contenga caracteres especiales.'
+            })
+            return false;
+        }
+
+        Swal.fire({
+            title: "Exito!",
+            text: "Usuario egistrado exitosamente",
+            icon: "success",
+            showConfirmButton: false,
+            time:3000
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/registroUsuarios"; 
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de registro',
+                    text: 'No se pudo registrar el producto. Por favor, verifica los campos e inténtalo de nuevo.'
+                });
+            }
+            
+        });
+    }
+</script>
+
 <footer>
     <%- include('./layout/footer.ejs'); %>
 </footer>

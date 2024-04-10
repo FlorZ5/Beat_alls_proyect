@@ -1184,8 +1184,8 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-  background-color: #051922;
-  color: #F28123;
+  background-color: #00a3ee;
+  color: #ffffff;
 }
 
 div.owl-controls, .owl-controls div {
@@ -1466,8 +1466,8 @@ html, body {
 }
 
 input[type="submit"] {
-  background-color: #f2f223;
-  color: #051922;
+  background-color: #f223e4;
+  color: #ffffff;
   font-weight: 700;
   text-transform: uppercase;
   font-size: 15px;

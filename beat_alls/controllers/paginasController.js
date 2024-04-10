@@ -1,6 +1,7 @@
 const db = require('../config/db.js');
 const {Op, sequelize, where} = require('sequelize');
 const os = require('os');
+const escapeHtml = require('escape-html');
 const {encrypt, compare} = require('../helpers/handleBcrypt.js');
 const usuarioModel = require('../models/usuarioModel.js');
 const clienteModel = require('../models/clienteModel.js');
@@ -100,6 +101,29 @@ const passChange = async (req, res) => {
     const { pregunta, Contrasena } = req.body;
 
     try {
+        const stringCharacter = ["'","-","`","~","!","¡","@","#","$","%","^","&","","(",")","_","=","-","{","}","[","]","?","<",">",".",",","/","","-","+",":",";",'"', "´", "°"] ;
+        let ContrasenaV = Contrasena;
+        longitudContrasena=ContrasenaV.length;
+
+        for (let index = 0; index < ContrasenaV.length; index++) {
+            extraeContrasena=ContrasenaV.charAt(index);
+            console.log(extraeContrasena); 
+            ContrasenaV_character=stringCharacter.indexOf(extraeContrasena);
+            console.log(ContrasenaV_character);  
+        }
+        if (ContrasenaV_character>=0) {
+            console.log("La contraseña no debe contener caracteres especiales");
+            res.render('registroUsuarios',{
+            titulo:'Usuarios registrados', 
+            enc:'Usuarios registrados'});
+        }
+        if (longitudContrasena!=8) {
+            console.log("La contraseña debe de tener una longitud de 8 letras y numeros");
+            res.render('registroUsuarios',{
+            titulo:'Usuarios registrados', 
+            enc:'Usuarios registrados'});
+        }
+
         const usuario = await usuarioModel.findOne({ where: { Nombre_usuario: pregunta } });
         if (usuario) {
             const passwordHash = await encrypt(Contrasena);
@@ -131,24 +155,40 @@ const passChange = async (req, res) => {
 const inicioSesion = async (req, res) => {
     try {
         const { Login, Contrasena } = req.body;
+
+
+        const nombreEscapado = escapeHtml(Login);
+        const contraEscapado = escapeHtml(Contrasena);
+
+
         const usuario = await usuarioModel.findOne({ where: { 
-            [Op.or]: [{Nombre_usuario: Login}, {Correo: Login}] 
+            [Op.or]: [{Nombre_usuario: nombreEscapado}, {Correo: nombreEscapado}] 
         }});
 
         const cliente = await clienteModel.findOne({ where: {
-            [Op.or]: [{Nombre_usuario: Login}, {Correo: Login}]
+            [Op.or]: [{Nombre_usuario: nombreEscapado}, {Correo: nombreEscapado}]
         }});
 
 
         if (!usuario && !cliente) {
-            return res.status(404).render('login', {
-                titulo: "Login",
-                enc: "Inicio de sesión"
+            return res.render('login',{
+                title:"Error",
+                alertMessag:'Usuario no encontrado',
+                icon:"warning"
             });
+            
         }          
 
         if (usuario) {
-            const validarContraUsuario = await compare(Contrasena, usuario.Contrasena);
+            const validarContraUsuario = await compare(contraEscapado, usuario.Contrasena);
+            if(!validarContraUsuario)
+            {
+                return res.render('login',{
+                    title:"Error",
+                    alertMessag:'Contraseña Incorrecta',
+                    icon:"warning"
+                });
+            }
             if (validarContraUsuario) {
                 if(usuario.dataValues.Rol == "Administrador")
                 {
@@ -197,7 +237,15 @@ const inicioSesion = async (req, res) => {
         }
 
         if (cliente) {
-            const validarContraCliente = await compare(Contrasena, cliente.Contrasena);
+            const validarContraCliente = await compare(contraEscapado, cliente.Contrasena);
+            if(!validarContraCliente)
+            {
+                return res.render('login',{
+                    title:"Error",
+                    alertMessag:'Contraseña Incorrecta',
+                    icon:"warning"
+                });
+            }
                 if (validarContraCliente) {
                     req.session.userRole = 'Cliente';
                     req.session.cliente = cliente;

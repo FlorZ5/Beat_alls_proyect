@@ -26,31 +26,31 @@
         <form action="/clientesRegistrados/<%- ID_Cliente %>" method="post">
             <div class="mb-3">
                 <label for="Nombre" class="form-label">Nombre:</label>
-                <input name="Nombre" id="Nombre" class="form-control" type="text" value="<%- Nombre %>">
+                <input name="Nombre" id="Nombre" class="form-control" type="text" value="<%- Nombre %>" placeholder="Entre 4 y 30 caracteres.">
                 <span class="form-text">Nombre actual: <%- Nombre %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Apellido" class="form-label">Apellido:</label>
-                <input name="Apellido" id="Apellido" class="form-control" type="text" value="<%- Apellido %>">
+                <input name="Apellido" id="Apellido" class="form-control" type="text" value="<%- Apellido %>" placeholder="Entre 4 y 30 caracteres.">
                 <span class="form-text">Apellido actual: <%- Apellido %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Direccion" class="form-label">Dirección:</label>
-                <input name="Direccion" id="Direccion" class="form-control" type="text" value="<%- Direccion %>">
+                <input name="Direccion" id="Direccion" class="form-control" type="text" value="<%- Direccion %>" placeholder="Entre 20 y 75 caracteres.">
                 <span class="form-text">Dirección actual: <%- Direccion %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Edad" class="form-label">Edad:</label>
-                <input name="Edad" id="Edad" class="form-control" type="text" value="<%- Edad %>">
+                <input name="Edad" id="Edad" class="form-control" type="text" value="<%- Edad %>" placeholder="Ingresa solo números">
                 <span class="form-text">Edad actual: <%- Edad %></span>
             </div>
 
             <div class="mb-3">
                 <label for="Fecha_nacimiento" class="form-label">Fecha de nacimiento:</label>
-                <input name="Fecha_nacimiento" id="Fecha_nacimiento" class="form-control" type="date" value="<%- Fecha_nacimiento %>">
+                <input name="Fecha_nacimiento" id="Fecha_nacimiento" class="form-control" type="date" value="<%- Fecha_nacimiento %>" placeholder="01-01-2000">
                 <span class="form-text">Fecha de nacimiento actual: <%- Fecha_nacimiento %></span>
             </div>
 
@@ -64,4 +64,39 @@
 <footer>
     <%- include('./layout/footer.ejs'); %>
 </footer>
+
+
+<script>
+    document.getElementById('actualizarForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const nombre = document.getElementById('Nombre').value;
+        const apellido = document.getElementById('Apellido').value;
+        const direccion = document.getElementById('Direccion').value;
+        const edad = document.getElementById('Edad').value;
+
+        if (!nombre || !apellido || !direccion || !edad) {
+            mostrarError('Ningún campo debe estar vacío.');
+        } else if (!/^[a-zA-Z\s]{4,30}$/.test(nombre)) {
+            mostrarError('El nombre debe contener entre 4 y 30 caracteres y solo letras.');
+        } else if (!/^[a-zA-Z\s]{4,30}$/.test(apellido)) {
+            mostrarError('El apellido debe contener entre 4 y 30 caracteres y solo letras.');
+        } else if (!/^[\w\s#]{20,75}$/.test(direccion)) {
+            mostrarError('La dirección debe contener entre 20 y 75 caracteres y puede contener letras, números, el símbolo "#" y espacios.');
+        } else if (!/^\d{2}$/.test(edad)) {
+            mostrarError('La edad debe contener exactamente 2 dígitos.');
+        } else {
+            // Si todas las validaciones pasan, enviar el formulario
+            this.submit();
+        }
+    });
+
+    function mostrarError(mensaje) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: mensaje
+        });
+    }
+</script>
 </html>

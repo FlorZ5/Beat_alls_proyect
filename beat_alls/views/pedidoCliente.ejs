@@ -1,10 +1,9 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
 	<meta charset="UTF-8">
-    <meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="Responsive Bootstrap4 Shop Template, https://imransdesign.com/">
 	<link rel="shortcut icon" type="image/png" href="/assets/images/LOGO5.png">
     <link rel="stylesheet" href="/assets/css/formulario.css">
     <title><%= titulo %></title> 
@@ -38,6 +37,7 @@
                                 <th class="product-name">Ubicación</th>
                                 <th class="product-name">Fecha</th>
                                 <th class="product-name">Estado del pedido</th>
+                                <th>Resumen</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -62,8 +62,7 @@
                                             <% if (index === 0) { %>
                                                 <td rowspan="<%= pedidosMismoNumero.length %>">
                                                     Cantidad a pagar: <%= cantidadPagarPorPedido[numeroPedido] %><br>
-                                                    <button type="button" style="border-radius: 15px;"><a href="/cancelarPedido/<%= numeroPedido %>" style="text-decoration: none; color: black;">Cancelar pedido</a></button><br><br>
-                                                    <button type="button" style="border-radius: 15px;"><a href="/pagar" style="text-decoration: none; color: black;">Pagar</a></button>
+                                                    <a onclick="confrimar(<%= numeroPedido %>)" style="text-decoration: none; color: red; width: auto;">Cancelar pedido</a><br><br>
                                                 </td>
                                             <% } %>
                                             <% if (index !== 0) { %>
@@ -82,6 +81,36 @@
     </div>
 </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+        <script>
+        
+            function confrimar(id)
+            {
+                Swal.fire({
+                    title: '¿Quieres cancelar el pedido?',
+                    text: "Si cancelas el pedido no podrás revertir la acción",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Eliminar",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        window.location= '/cancelarPedido/'+id;
+                        Swal.fire({
+                            title: "Cancelado!",
+                            text: "El pedido se ha cancelado",
+                            icon: "success",
+                            timer:3000
+                        });
+                        setTimeout(function(){
+                            window.location= '/pedidosEnCurso';
+                        },1000)
+                    }
+                })
+            }
+    </script>
 <footer>
     <%- include('./layout/footer.ejs'); -%>
 </footer>

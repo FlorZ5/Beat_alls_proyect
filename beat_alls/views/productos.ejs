@@ -30,7 +30,7 @@
                       <form action="/agregarAlCarrito" method="post"> 
                           <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="tarjeta" style="border-bottom: 100px;">
-                                <div class="card" style="width: auto;">
+                                <div class="card" style="width: auto; " >
                                     <img height="200" width="200" src="/<%- producto.filepath %>" class="card-img-top" alt="<%- producto.Descripcion %>">
                                     <div class="card-body">
                                       <center><h6 class="card-title"><%- producto.Nombre_producto %></h6></center>
@@ -42,7 +42,7 @@
                                       <center><label for="">Piezas disponibles: </label></center>
                                       <center><label for="" name="stock"><%- producto.Existencias %></label></center><br>
                                       <input type="hidden" name="ID_Producto" value="<%- producto.ID_Producto %>">
-                                      <center><input type="submit" value="Añadir al carrito" style="height: auto; width: auto;"></center>
+                                      <center><input  type="submit" value="Añadir al carrito" style="height: auto; width: auto;"></center>
                                     </div>
                                 </div><br><br>
                             </div>
